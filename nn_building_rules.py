@@ -8,6 +8,8 @@ class LayerType(enum.Enum):
     POOLING = 3
     RECURRENT = 4
     DROPOUT = 5
+    PertrubateParam = 6
+    EMPTY = 7
 
 
 class ActivationFunction(enum.Enum):
@@ -47,6 +49,8 @@ NN_STACKING_RULES = {
     LayerType.POOLING: (LayerType.FULLY_CONNECTED, LayerType.CONVOLUTIONAL),
     LayerType.RECURRENT: (LayerType.FULLY_CONNECTED, LayerType.RECURRENT),
     LayerType.DROPOUT: (LayerType.FULLY_CONNECTED, LayerType.CONVOLUTIONAL, LayerType.RECURRENT),
+    LayerType.PertrubateParam: tuple(),
+    LayerType.EMPTY: (LayerType.FULLY_CONNECTED, LayerType.RECURRENT, LayerType.CONVOLUTIONAL),
 }
 
 ACTIVATION_FOR_LAYER_TYPE = {
@@ -58,7 +62,7 @@ ACTIVATION_FOR_LAYER_TYPE = {
 
 ELEMENTS_FROM_ARRAY_USED_BY_LAYER = {
     LayerType.FULLY_CONNECTED: (NNArrayStructure.NUMBER_OF_NEURONS, NNArrayStructure.ACTIVATION_FUNCTION),
-    LayerType.CONVOLUTIONAL: (NNArrayStructure(i) for i in range(2, 7)),
+    LayerType.CONVOLUTIONAL: (NNArrayStructure(i) for i in range(2, 6)),
     LayerType.POOLING: (NNArrayStructure.POOLING_SIZE,),
     LayerType.RECURRENT: (NNArrayStructure.NUMBER_OF_NEURONS, NNArrayStructure.ACTIVATION_FUNCTION),
     LayerType.DROPOUT: (NNArrayStructure.DROPOUT_RATE,),

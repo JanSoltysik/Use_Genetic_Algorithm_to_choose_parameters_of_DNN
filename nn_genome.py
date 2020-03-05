@@ -58,7 +58,7 @@ def generate_layer(layer_type, activation_function=0):
 
     for ind, generate in zip(indices, functions):
         layer[ind] = generate() \
-            if NNArrayStructure(ind+1) in indices_of_allowed_elements else 0
+            if NNArrayStructure(ind + 1) in indices_of_allowed_elements else 0
 
     return layer
 
@@ -79,11 +79,17 @@ class NNGenome:
         hidden_layers = []
         added_layers = 0
         prev_layer_type = nn_type.value
+
         while added_layers < self.max_layers:
             add_next_layer_prob = 1 - np.sqrt(1 - random.random())
 
-            current_layer_type = random.choice(
-                list(set(NN_STACKING_RULES[LayerType(prev_layer_type)]) & set(NN_STACKING_RULES[nn_type]))).value
+            # After we switch from convolutional to fully connected we can't add any more conv layers
+            if prev_layer_type == 1:
+                nn_type = LayerType.FULLY_CONNECTED
+
+            available_layers = list(set(NN_STACKING_RULES[LayerType(prev_layer_type)]) & \
+                                    set(NN_STACKING_RULES[nn_type]))
+            current_layer_type = random.choice(available_layers).value
             current_layer = generate_layer(current_layer_type, activation_function)
             prev_layer_type = current_layer[0]
             hidden_layers.append(current_layer)

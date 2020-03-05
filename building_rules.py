@@ -59,7 +59,7 @@ ACTIVATION_FOR_LAYER_TYPE = {
 
 ELEMENTS_FROM_ARRAY_USED_BY_LAYER = {
     LayerType.FULLY_CONNECTED: (NNArrayStructure.NUMBER_OF_NEURONS, NNArrayStructure.ACTIVATION_FUNCTION),
-    LayerType.CONVOLUTIONAL: tuple(NNArrayStructure(i) for i in range(2, 7)),
+    LayerType.CONVOLUTIONAL: tuple(NNArrayStructure(i) for i in range(3, 7)),
     LayerType.POOLING: (NNArrayStructure.POOLING_SIZE,),
     LayerType.RECURRENT: (NNArrayStructure.NUMBER_OF_NEURONS, NNArrayStructure.ACTIVATION_FUNCTION),
     LayerType.DROPOUT: (NNArrayStructure.DROPOUT_RATE,),

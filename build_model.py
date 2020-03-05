@@ -1,5 +1,6 @@
 import tensorflow as tf
 from tensorflow import keras
+import numpy as np
 
 activation_functions = {
     0: keras.activations.sigmoid,
@@ -33,8 +34,9 @@ def get_keras_model(nn_list, input_shape):
     model = keras.models.Sequential()
 
     if nn_list[0][0] == 1:
+        model.add(keras.layers.Flatten())
         keras_layer = keras.layers.Dense(units=nn_list[0][1], activation=activation_functions[nn_list[0][2]],
-                                         kernel_initializer="glorot_normal", input_shape=input_shape)
+                                         kernel_initializer="glorot_normal")
     elif nn_list[0][0] == 2:
         keras_layer = keras.layers.Conv2D(filters=nn_list[0][3],
                                           activation=activation_functions[nn_list[0][2]],
@@ -60,11 +62,35 @@ def get_keras_model(nn_list, input_shape):
     return model
 
 
-def main():
+def partialy_train(nn_list, X, y, training_epochs, validation_split):
+    input_shape = (28, 28, 1)
+    model = get_keras_model(nn_list, input_shape)
+
+    output_layer_activation_function = nn_list[-1][2]
+    if output_layer_activation_function == 0:
+        loss_fn = "binary_crossentropy"
+    elif output_layer_activation_function == 3:
+        loss_fn = "sparse_categorical_crossentropy"
+    else:
+        loss_fn = "mean_squared_error"
+    model.compile(loss=loss_fn, optimizer="adam", metrics=["accuracy"])
+    history = model.fit(X, y, epochs=training_epochs, validation_split=validation_split)
+
+    return max(history.history["val_acc"]), model.count_params()
+
+
+def test_building_on_fashion_mnist():
     input, out = [2, 264, 2, 64, 3, 1, 2, 1], [1, 10, 3, 0, 0, 0, 0, 0]
     from nn_genome import NNGenome
-    gen = NNGenome(input, out, 1).genome
+    gen = NNGenome(input, out, 0.1).genome
     print(gen)
-    get_keras_model(gen, input_shape=[28, 28, 1])
 
-main()
+    fashion_mnist = keras.datasets.fashion_mnist
+    (train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
+    train_images = train_images / 255.0
+    train_images = train_images.reshape((train_images.shape[0], 28, 28, 1))
+
+    print(partialy_train(gen, train_images, train_labels, 10, 0.4))
+
+
+test_building_on_fashion_mnist()

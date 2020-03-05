@@ -1,6 +1,7 @@
 import building_rules
 from building_rules import MAX_VALUE_FOR_ARRAY_ELEMENT, NNArrayStructure, LayerType, \
     NN_STACKING_RULES
+
 import random
 import numpy as np
 

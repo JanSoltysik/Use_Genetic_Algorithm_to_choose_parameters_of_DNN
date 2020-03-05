@@ -1,4 +1,3 @@
-import numpy as np
 import enum
 
 
@@ -44,7 +43,7 @@ MAX_VALUE_FOR_ARRAY_ELEMENT = {
 NN_STACKING_RULES = {
     LayerType.FULLY_CONNECTED: (LayerType.FULLY_CONNECTED, LayerType.DROPOUT),
     LayerType.CONVOLUTIONAL: (LayerType.FULLY_CONNECTED, LayerType.CONVOLUTIONAL, LayerType.POOLING,
-                              LayerType.RECURRENT, LayerType.DROPOUT),
+                              LayerType.DROPOUT),
     LayerType.POOLING: (LayerType.FULLY_CONNECTED, LayerType.CONVOLUTIONAL),
     LayerType.RECURRENT: (LayerType.FULLY_CONNECTED, LayerType.RECURRENT),
     LayerType.DROPOUT: (LayerType.FULLY_CONNECTED, LayerType.CONVOLUTIONAL, LayerType.RECURRENT),
@@ -60,7 +59,7 @@ ACTIVATION_FOR_LAYER_TYPE = {
 
 ELEMENTS_FROM_ARRAY_USED_BY_LAYER = {
     LayerType.FULLY_CONNECTED: (NNArrayStructure.NUMBER_OF_NEURONS, NNArrayStructure.ACTIVATION_FUNCTION),
-    LayerType.CONVOLUTIONAL: (NNArrayStructure(i) for i in range(2, 6)),
+    LayerType.CONVOLUTIONAL: tuple(NNArrayStructure(i) for i in range(2, 7)),
     LayerType.POOLING: (NNArrayStructure.POOLING_SIZE,),
     LayerType.RECURRENT: (NNArrayStructure.NUMBER_OF_NEURONS, NNArrayStructure.ACTIVATION_FUNCTION),
     LayerType.DROPOUT: (NNArrayStructure.DROPOUT_RATE,),

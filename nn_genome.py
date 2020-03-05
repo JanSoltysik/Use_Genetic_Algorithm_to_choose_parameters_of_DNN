@@ -53,7 +53,7 @@ def generate_layer(layer_type, activation_function=0):
         layer[2] = 0
 
     indices = (1, 3, 4, 5, 6, 7)
-    functions = (generate_number_of_neurons, generate_number_of_filters, generate_pooling_size,
+    functions = (generate_number_of_neurons, generate_number_of_filters, generate_kernel_size,
                  generate_kernel_stride, generate_pooling_size, generate_dropout_rate)
 
     for ind, generate in zip(indices, functions):
@@ -75,7 +75,6 @@ class NNGenome:
     def generateHiddenLayers(self):
         nn_type = LayerType(self.input_layer[0])
         activation_function = self.input_layer[2]
-        possible_layers = NN_STACKING_RULES[nn_type]
 
         hidden_layers = []
         added_layers = 0

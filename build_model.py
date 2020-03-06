@@ -74,7 +74,8 @@ def partialy_train(nn_list, X, y, training_epochs, validation_split):
     else:
         loss_fn = "mean_squared_error"
     model.compile(loss=loss_fn, optimizer="adam", metrics=["accuracy"])
-    history = model.fit(X, y, epochs=training_epochs, validation_split=validation_split)
+    history = model.fit(X, y, epochs=training_epochs, validation_split=validation_split,
+                        verbose=0)
 
     return max(history.history["val_acc"]), model.count_params()
 

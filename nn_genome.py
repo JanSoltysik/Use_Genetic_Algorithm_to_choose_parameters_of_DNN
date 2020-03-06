@@ -1,9 +1,9 @@
-import building_rules
-from building_rules import MAX_VALUE_FOR_ARRAY_ELEMENT, NNArrayStructure, LayerType, \
-    NN_STACKING_RULES
-
 import random
 import numpy as np
+import building_rules
+# import build_model
+from building_rules import MAX_VALUE_FOR_ARRAY_ELEMENT, NNArrayStructure, LayerType, \
+    NN_STACKING_RULES
 
 
 def generate_number_of_neurons():
@@ -13,7 +13,7 @@ def generate_number_of_neurons():
 
 def generate_activation_function(layer_type):
     max_value = MAX_VALUE_FOR_ARRAY_ELEMENT[NNArrayStructure.ACTIVATION_FUNCTION]
-    return random.randint(1, max_value - 1) if layer_type != LayerType.RECURRENT else 2
+    return random.randint(0, max_value - 2) if layer_type != LayerType.RECURRENT else 2
 
 
 def generate_number_of_filters():
@@ -41,7 +41,7 @@ def generate_dropout_rate():
     return round(random.uniform(0.1, max_value), 2)
 
 
-def generate_layer(layer_type, activation_function=0):
+def generate_layer(layer_type, activation_function=None):
     indices_of_allowed_elements = building_rules.ELEMENTS_FROM_ARRAY_USED_BY_LAYER[LayerType(layer_type)]
     layer = [0] * 8
     layer[0] = layer_type
@@ -49,7 +49,7 @@ def generate_layer(layer_type, activation_function=0):
         if activation_function:
             layer[2] = activation_function
         else:
-            layer[2] = generate_activation_function()
+            layer[2] = generate_activation_function(layer_type)
     else:
         layer[2] = 0
 
@@ -65,13 +65,27 @@ def generate_layer(layer_type, activation_function=0):
 
 
 class NNGenome:
-    def __init__(self, input_layer, output_layer, more_layers_probability, max_layers=10):
+    def __init__(self, input_shape, output_layer, architecture_type, more_layers_probability,
+                 max_layers=10):
         self.more_layers_probability = more_layers_probability
-        self.input_layer = input_layer
+        self.input_shape = input_shape
         self.output_layer = output_layer
+        self.architecture_type = architecture_type
         self.max_layers = max_layers
-
+        """
+        self.X = X
+        self.y = y
+        self.validation_split = validation_split
+        self.training_epochs = training_epochs
+        """
+        self.input_layer = self.generateInputLayer()
         self.genome = [self.input_layer, *self.generateHiddenLayers(), self.output_layer]
+
+    def generateInputLayer(self):
+        layer = generate_layer(self.architecture_type)
+        if self.architecture_type == 1:
+            layer[1] = np.prod(self.input_shape)
+        return layer
 
     def generateHiddenLayers(self):
         nn_type = LayerType(self.input_layer[0])
@@ -102,5 +116,6 @@ class NNGenome:
 
         return hidden_layers
 
-    def getFitness(self):
-        pass  # potrzebne powiazanie z kerasem
+    def __str__(self):
+        return self.genome
+

@@ -10,6 +10,16 @@ activation_functions = {
     4: keras.activations.linear,
 }
 
+def get_output_layer_activation_function(nn_list):
+    output_layer_activation_function = nn_list[-1][2]
+    if output_layer_activation_function == 0:
+        loss_fn = "binary_crossentropy"
+    elif output_layer_activation_function == 3:
+        loss_fn = "sparse_categorical_crossentropy"
+    else:
+        loss_fn = "mean_squared_error"
+
+    return loss_fn
 
 def build_layer(layer):
     if layer[0] == 1:
@@ -62,22 +72,18 @@ def get_keras_model(nn_list, input_shape):
     return model
 
 
-def partialy_train(nn_list, X, y, training_epochs, validation_split):
-    input_shape = (28, 28, 1)
+def partialy_train(nn_list, X, y, training_epochs, validation_split, verbose=0, final_train=False):
+    input_shape = X.shape
     model = get_keras_model(nn_list, input_shape)
 
-    output_layer_activation_function = nn_list[-1][2]
-    if output_layer_activation_function == 0:
-        loss_fn = "binary_crossentropy"
-    elif output_layer_activation_function == 3:
-        loss_fn = "sparse_categorical_crossentropy"
-    else:
-        loss_fn = "mean_squared_error"
+    loss_fn = get_output_layer_activation_function(nn_list)
     model.compile(loss=loss_fn, optimizer="adam", metrics=["accuracy"])
     history = model.fit(X, y, epochs=training_epochs, validation_split=validation_split,
-                        verbose=0)
-
-    return max(history.history["val_acc"]), model.count_params()
+                        verbose=verbose)
+    if final_train:
+        return model
+    else:
+        return max(history.history["val_acc"]), model.count_params()
 
 
 def test_building_on_fashion_mnist():

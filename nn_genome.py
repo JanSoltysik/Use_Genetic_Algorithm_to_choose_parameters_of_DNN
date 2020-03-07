@@ -3,7 +3,7 @@ import numpy as np
 import building_rules
 # import build_model
 from building_rules import MAX_VALUE_FOR_ARRAY_ELEMENT, NNArrayStructure, LayerType, \
-    NN_STACKING_RULES
+    NN_STACKING_RULES, ELEMENTS_FROM_ARRAY_USED_BY_LAYER
 
 
 def generate_number_of_neurons():
@@ -11,9 +11,9 @@ def generate_number_of_neurons():
     return 8 * random.randint(1, max_value)
 
 
-def generate_activation_function(layer_type):
+def generate_activation_function():
     max_value = MAX_VALUE_FOR_ARRAY_ELEMENT[NNArrayStructure.ACTIVATION_FUNCTION]
-    return random.randint(0, max_value - 2) if layer_type != LayerType.RECURRENT else 2
+    return random.randint(0, max_value - 2)
 
 
 def generate_number_of_filters():
@@ -49,7 +49,7 @@ def generate_layer(layer_type, activation_function=None):
         if activation_function:
             layer[2] = activation_function
         else:
-            layer[2] = generate_activation_function(layer_type)
+            layer[2] = generate_activation_function()
     else:
         layer[2] = 0
 
@@ -64,9 +64,20 @@ def generate_layer(layer_type, activation_function=None):
     return layer
 
 
+generate_layer_elem = {
+    2: generate_number_of_neurons,
+    3: generate_activation_function,
+    4: generate_number_of_filters,
+    5: generate_kernel_size,
+    6: generate_kernel_stride,
+    7: generate_pooling_size,
+    8: generate_dropout_rate,
+}
+
+
 class NNGenome:
     def __init__(self, input_shape, output_layer, architecture_type, more_layers_probability,
-                 max_layers=10):
+                 max_layers=10, genome=None):
         self.more_layers_probability = more_layers_probability
         self.input_shape = input_shape
         self.output_layer = output_layer
@@ -79,7 +90,11 @@ class NNGenome:
         self.training_epochs = training_epochs
         """
         self.input_layer = self.generateInputLayer()
-        self.genome = [self.input_layer, *self.generateHiddenLayers(), self.output_layer]
+        if not genome:
+            self.genome = [self.input_layer, *self.generateHiddenLayers(), self.output_layer]
+        else:
+            self.genome = genome
+            self.input_layer = genome[0]
 
     def generateInputLayer(self):
         layer = generate_layer(self.architecture_type)
@@ -115,6 +130,11 @@ class NNGenome:
             added_layers += 1
 
         return hidden_layers
+
+    def getActivationFunction(self):
+        for layer in self.genome:
+            if NNArrayStructure.ACTIVATION_FUNCTION in ELEMENTS_FROM_ARRAY_USED_BY_LAYER[LayerType(layer[0])]:
+                return layer[NNArrayStructure.ACTIVATION_FUNCTION.value]
 
     def __str__(self):
         return self.genome

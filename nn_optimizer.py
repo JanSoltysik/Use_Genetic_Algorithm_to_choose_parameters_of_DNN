@@ -263,7 +263,7 @@ class NNOptimize:
     def mutate_population(self, population):
         for genome in population:
             if np.random.random() > self.mutation_probability:
-                rnd_index = np.random.randint(len(genome.genome) - 2)
+                rnd_index = np.random.randint(len(genome.genome) - 1)
                 genome.genome = self.mutation(genome.genome, rnd_index)
 
     def is_generation_similar(self, population, similarity_treshold=0.9):
@@ -303,7 +303,7 @@ class NNOptimize:
     def find_best_model(self, X, y, labels=None):
         best_models = []
 
-        nb_of_classes = max(y) if not labels else labels
+        nb_of_classes = max(y) + 1 if not labels else labels
         for _ in range(self.total_experiments):
             population = self.generate_initial_population(X.shape[1:], nb_of_classes)
             best_model = None
@@ -337,7 +337,7 @@ class NNOptimize:
 
 
 if __name__ == "__main__":
-    op = NNOptimize(population_size=3, training_epochs=1, tournament_size=2)
+    op = NNOptimize(population_size=3, training_epochs=1, tournament_size=2, max_generations=2, total_experiments=2)
 
     from tensorflow import keras
 
@@ -363,9 +363,11 @@ if __name__ == "__main__":
 
     print(len(parents))
     print(op.mutate_population(parents))
-    """
     print("Orginal:", s3)
     s3_temp = copy.deepcopy(s3)
     for i in range(len(s3) - 1):
         print(op.mutation(s3_temp, i), end='\n\n')
         s3_temp = copy.deepcopy(s3)
+    """
+
+    print(op.find_best_model(X[:10], y[:10]))

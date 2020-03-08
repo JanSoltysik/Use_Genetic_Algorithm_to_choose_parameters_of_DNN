@@ -37,7 +37,7 @@ def find_all_pairs_compatible_in_parent(parent, layer_prev, layer_next, is_first
         elif LayerType(layer[0]) in NN_STACKING_RULES[LayerType(layer_prev[0])]:
             compatible_prev.append(i)
 
-        if layer_next[0] in NN_STACKING_RULES[LayerType(layer[0])]:
+        if LayerType(layer_next[0]) in NN_STACKING_RULES[LayerType(layer[0])]:
             compatible_next.append(i)
 
     return compatible_prev, compatible_next
@@ -49,7 +49,7 @@ def create_offspring_from_crossover_points(parent_1, parent_2, r1, r2, r3, r4, a
     offspring.extend(parent_1[r2 + 1:])
     offspring = copy.deepcopy(offspring)
 
-    for layer in offspring:
+    for layer in offspring[:-1]:
         if NNArrayStructure.ACTIVATION_FUNCTION in ELEMENTS_FROM_ARRAY_USED_BY_LAYER[LayerType(layer[0])]:
             layer[2] = activation_fn
 
@@ -66,7 +66,7 @@ def layers_wise_distance_between_genomes(genome_1, genome_2):
 
         distance += np.linalg.norm(layer_distance, 2)
     """
-    for s1_layer, s2_layer in list(zip(s1, s2))[:len(s2 - 1)]:
+    for s1_layer, s2_layer in list(zip(s1, s2))[:len(s2) - 1]:
         layer_distance = np.subtract(s1_layer, s2_layer)
 
         distance += np.linalg.norm(layer_distance, 2)
@@ -79,7 +79,7 @@ def layers_wise_distance_between_genomes(genome_1, genome_2):
 
         distance += np.linalg.norm(layer_distance, 2)
     """
-    for layer in s1[len(s2) - 1:len(s1 - 1)]:
+    for layer in s1[len(s2) - 1:len(s1) - 1]:
         distance += np.linalg.norm(layer, 2)
 
     return distance
@@ -106,11 +106,12 @@ class NNOptimize:
 
         self.population = []
 
-    def getOutputLayer(self, output_shape):
+    def getOutputLayer(self, units_in_layer):
         output_list = [0] * 8
-        output_list[1] = output_shape[2]
+        output_list[0] = LayerType.FULLY_CONNECTED.value
+        output_list[1] = units_in_layer
         if self.problem_type == 1:
-            activation_function = ActivationFunction.SIGMOID if output_shape[0] == 1 \
+            activation_function = ActivationFunction.SIGMOID if units_in_layer == 1 \
                 else ActivationFunction.SOFTMAX
         else:
             activation_function = ActivationFunction.LINEAR
@@ -118,23 +119,30 @@ class NNOptimize:
 
         return output_list
 
-    def generate_initial_population(self, input_shape, output_shape):
-        output_list = self.getOutputLayer(output_shape)
+    def generate_initial_population(self, input_shape, nr_of_classes):
+        if self.architecture_type == 1:
+            units_in_output_layer = nr_of_classes
+        else:
+            units_in_output_layer = 1
+        output_list = self.getOutputLayer(units_in_output_layer)
 
         return [nn_genome.NNGenome(input_shape, output_list,
-                                   self.architecture_type,
                                    self.add_more_layers_prob)
                 for _ in range(self.population_size)]
 
     def get_population_fitness(self, population, X, y):
         scores = [build_model.partialy_train(genome.genome, X, y, self.training_epochs, self.cross_validation_ratio)
                   for genome in population]
+
         performance_score, weights = list(zip(*scores))
 
         map(rescale_size_of_nn, weights)
-        scaled_performance_score = performance_score / np.linalg.norm(performance_score)
 
-        fitness = 10 * (1 - self.nn_size_scaler) * scaled_performance_score + self.nn_size_scaler * weights
+        norm_scale = np.linalg.norm(performance_score)
+        map(lambda score: score / norm_scale, performance_score)
+
+        fitness = 10 * (1 - self.nn_size_scaler) * np.array(performance_score) +\
+                  self.nn_size_scaler * np.array(weights)
 
         return fitness, np.argmin(fitness)
 
@@ -145,26 +153,28 @@ class NNOptimize:
                 new_parent = population_with_fitness[ind * 2][0]
             else:
                 new_parent = population_with_fitness[ind * 2 + 1][0]
+
             parents.append(new_parent)
 
         return parents
 
     def selection(self, population, fitness_values):
         parents = []
-        while len(population) < 2 * self.population_size:
-            tournament_members = np.random.choice(zip(population, fitness_values), self.tournament_size)
-            parents.append(self.tournament_selection(tournament_members))
+        population_with_fitness = np.array(list(zip(population, fitness_values)))
+        while len(parents) < 2 * self.population_size:
+            index = np.random.choice(range(len(population)), self.tournament_size)
+            parents.extend(self.tournament_selection(population_with_fitness[index]))
 
         return parents
 
     def crossover(self, parent_1, parent_2):
         # we exclude last layer in crossover because it is the same in every nn in population
-        len_parent_1 = len(parent_1.genome) - 1
+        len_parent_1 = len(parent_1) - 1
         r1 = r2 = r3 = r4 = 0
-        succes = False
+        success = False
 
         for _ in range(self.max_similar_models):
-            r1, r2 = sorted(np.random.randint(len_parent_1, 2))
+            r1, r2 = sorted(np.random.randint(len_parent_1 - 1, size=2))
             if r1 == r2:
                 r2 = len_parent_1 - 1
 
@@ -173,21 +183,21 @@ class NNOptimize:
                 layer_prev = parent_1[r1]
             else:
                 layer_prev = parent_1[r1 - 1]
-            layer_next = parent_1[r1 - 1]
+            layer_next = parent_1[r2]
 
-            compatible_prev, compatible_next = find_all_pairs_compatible_in_parent(parent_2, layer_prev, layer_next)
+            compatible_prev, compatible_next = find_all_pairs_compatible_in_parent(parent_2, layer_prev, layer_next,
+                                                                                   is_first_layer)
 
-            compatible = []
-            if not compatible_prev or not compatible_prev:
-                compatible = [(i, j) for i in compatible_prev for j in compatible_next if 0 <= j - i < self.max_layers]
-
-                if not compatible:
-                    random_pair = np.random.choice(compatible)
-                    r3, r4 = random_pair
-                    succes = True
+            if compatible_prev and compatible_prev:
+                compatible = [(i, j) for i in compatible_prev for j in compatible_next
+                              if 0 <= j - i < self.max_layers]
+                if compatible:
+                    index = np.random.choice(range(len(compatible)))
+                    r3, r4 = compatible[index]
+                    success = True
                     break
 
-        return r1, r2, r3, r4, succes
+        return r1, r2, r3, r4, success
 
     def crossover_population(self, parents):
         offsprings = []
@@ -206,14 +216,14 @@ class NNOptimize:
                                                                r1, r2, r3, r4, activation_fn)
 
             offsprings.append(nn_genome.NNGenome(parent_1.input_shape, parent_1.output_layer,
-                                                 self.architecture_type, self.add_more_layers_prob,
+                                                 self.add_more_layers_prob,
                                                  self.max_layers, genome=offspring))
 
         return offsprings
 
-    def mutation(self, nn_genome, layer_ind):
-        layer = nn_genome[layer_ind]
-        next_layer = nn_genome[layer_ind + 1]
+    def mutation(self, nn_list, layer_ind):
+        layer = nn_list[layer_ind]
+        next_layer = nn_list[layer_ind + 1]
 
         if layer[0] == LayerType.POOLING.value:
             rnd_layer_elem_type = NNArrayStructure.POOLING_SIZE
@@ -221,34 +231,39 @@ class NNOptimize:
             rnd_layer_elem_type = NNArrayStructure.DROPOUT_RATE
         else:
             # we need to add dropout layer in this case
-            rnd_layer_elem_type = np.random.choice(
-                set(ELEMENTS_FROM_ARRAY_USED_BY_LAYER[LayerType(layer[0])]) | {NNArrayStructure.DROPOUT_RATE})
+            possible_elements = \
+                list(set(ELEMENTS_FROM_ARRAY_USED_BY_LAYER[LayerType(layer[0])]) | {NNArrayStructure.DROPOUT_RATE})
+            rnd_ind = np.random.choice(range(len(possible_elements)))
+            rnd_layer_elem_type = possible_elements[rnd_ind]
 
         rnd_layer_elem = nn_genome.generate_layer_elem[rnd_layer_elem_type.value]()
+        print(rnd_layer_elem_type)
+        print(rnd_layer_elem)
 
         # we can't get invalid rnd_layer_elem
         if rnd_layer_elem_type != NNArrayStructure.DROPOUT_RATE:
-            layer[rnd_layer_elem_type.value] = rnd_layer_elem
+            layer[rnd_layer_elem_type.value - 1] = rnd_layer_elem
             if rnd_layer_elem_type == NNArrayStructure.ACTIVATION_FUNCTION:
-                nn_genome = rectify_activation_function_nn(nn_genome, layer[0], rnd_layer_elem)
+                nn_list = rectify_activation_function_nn(nn_list, layer[0], rnd_layer_elem)
         elif layer[0] != LayerType.DROPOUT.value:
             if next_layer[0] == LayerType.DROPOUT.value:
-                next_layer[NNArrayStructure.DROPOUT_RATE.value] = rnd_layer_elem
+                next_layer[NNArrayStructure.DROPOUT_RATE.value - 1] = rnd_layer_elem
             else:
-                nn_genome_tmp = nn_genome[:layer_ind + 1]
+                print('adding drop')
+                nn_genome_tmp = nn_list[:layer_ind + 1]
                 new_dropout_layer = [LayerType.DROPOUT.value, 0, 0, 0, 0, 0, 0, rnd_layer_elem]
                 nn_genome_tmp.append(new_dropout_layer)
-                nn_genome_tmp.extend(nn_genome[layer_ind + 1:])
-                nn_genome = copy.deepcopy(nn_genome_tmp)
+                nn_genome_tmp.extend(nn_list[layer_ind + 1:])
+                nn_list = copy.deepcopy(nn_genome_tmp)
         else:
-            layer[NNArrayStructure.DROPOUT_RATE.value] = rnd_layer_elem
+            layer[NNArrayStructure.DROPOUT_RATE.value - 1] = rnd_layer_elem
 
-        return nn_genome
+        return nn_list
 
     def mutate_population(self, population):
         for genome in population:
             if np.random.random() > self.mutation_probability:
-                rnd_index = np.random.randint(len(genome.genome) - 1)
+                rnd_index = np.random.randint(len(genome.genome) - 2)
                 genome.genome = self.mutation(genome.genome, rnd_index)
 
     def is_generation_similar(self, population, similarity_treshold=0.9):
@@ -285,10 +300,12 @@ class NNOptimize:
 
         return False
 
-    def find_best_model(self, X, y):
+    def find_best_model(self, X, y, labels=None):
         best_models = []
+
+        nb_of_classes = max(y) if not labels else labels
         for _ in range(self.total_experiments):
-            population = self.generate_initial_population(X.shape, y.shape)
+            population = self.generate_initial_population(X.shape[1:], nb_of_classes)
             best_model = None
             best_fitness = float("inf")
             for _ in range(self.max_generations):
@@ -305,7 +322,7 @@ class NNOptimize:
                 if self.is_generation_similar(population):
                     break
 
-            best_models.append((best_models, best_fitness))
+            best_models.append((best_model, best_fitness))
 
         return min(best_models, key=lambda model: model[1])
 
@@ -317,3 +334,38 @@ class NNOptimize:
                                            self.cross_validation_ratio, verbose=1, final_train=True)
 
         return model
+
+
+if __name__ == "__main__":
+    op = NNOptimize(population_size=3, training_epochs=1, tournament_size=2)
+
+    from tensorflow import keras
+
+    (X, y), _ = keras.datasets.fashion_mnist.load_data()
+    X = X / 255.0
+    X = X.reshape((X.shape[0]), 28, 28, 1)
+    """
+    population = op.generate_initial_population(X.shape[1:], 10)
+    fitness, _ = op.get_population_fitness(population, X[:10], y[:10])
+    parents = op.selection(population, fitness)
+    """
+
+    s1 = [[1, 264, 2, 0, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0, 0, 0.65], [1, 464, 2, 0, 0, 0, 0, 0],
+          [5, 0, 0, 0, 0, 0, 0, 0.35], [1, 872, 2, 0, 0, 0, 0, 0], [1, 10, 3, 0, 0, 0, 0, 0]]
+    s2 = [[1, 56, 0, 0, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0, 0, 0.25], [1, 360, 0, 0, 0, 0, 0, 0],
+          [1, 480, 0, 0, 0, 0, 0, 0], [1, 88, 0, 0, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0, 0, 0.2],
+          [1, 10, 3, 0, 0, 0, 0, 0]]
+    # print(create_offspring_from_crossover_points(s1, s2, 1, 3, 2, 4, 2))
+
+    s3 = nn_genome.NNGenome(X.shape[1:], [1, 10, 3, 0, 0, 0, 0, 0], more_layers_probability=0.6, max_layers=7).genome
+    """
+    parents = op.crossover_population(parents)
+
+    print(len(parents))
+    print(op.mutate_population(parents))
+    """
+    print("Orginal:", s3)
+    s3_temp = copy.deepcopy(s3)
+    for i in range(len(s3) - 1):
+        print(op.mutation(s3_temp, i), end='\n\n')
+        s3_temp = copy.deepcopy(s3)

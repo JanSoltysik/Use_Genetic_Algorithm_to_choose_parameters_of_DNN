@@ -72,8 +72,8 @@ def get_keras_model(nn_list, input_shape):
     return model
 
 
-def partialy_train(nn_list, X, y, training_epochs, validation_split, verbose=0, final_train=False):
-    input_shape = X.shape
+def partialy_train(nn_list, X, y, training_epochs, validation_split, verbose=1, final_train=False):
+    input_shape = X.shape[1:]
     model = get_keras_model(nn_list, input_shape)
 
     loss_fn = get_output_layer_activation_function(nn_list)
@@ -89,15 +89,17 @@ def partialy_train(nn_list, X, y, training_epochs, validation_split, verbose=0, 
 def test_building_on_fashion_mnist():
     input, out = [2, 264, 2, 64, 3, 1, 2, 1], [1, 10, 3, 0, 0, 0, 0, 0]
     from nn_genome import NNGenome
-    gen = NNGenome(input, out, 0.1).genome
-    print(gen)
 
     fashion_mnist = keras.datasets.fashion_mnist
     (train_images, train_labels), (test_images, test_labels) = fashion_mnist.load_data()
     train_images = train_images / 255.0
     train_images = train_images.reshape((train_images.shape[0], 28, 28, 1))
 
-    print(partialy_train(gen, train_images, train_labels, 10, 0.4))
+    gen = NNGenome(train_images.shape[1:], out, 0.1).genome
+    print(gen)
+    print(train_images.shape)
+    print(partialy_train(gen, train_images, train_labels, 1, 0.4, 1))
 
 
-test_building_on_fashion_mnist()
+if __name__ == '__main__':
+    test_building_on_fashion_mnist()

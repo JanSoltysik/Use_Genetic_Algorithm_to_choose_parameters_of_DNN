@@ -46,7 +46,7 @@ def generate_layer(layer_type, activation_function=None):
     layer = [0] * 8
     layer[0] = layer_type
     if NNArrayStructure.ACTIVATION_FUNCTION in indices_of_allowed_elements:
-        if activation_function:
+        if activation_function is not None:
             layer[2] = activation_function
         else:
             layer[2] = generate_activation_function()
@@ -76,12 +76,11 @@ generate_layer_elem = {
 
 
 class NNGenome:
-    def __init__(self, input_shape, output_layer, architecture_type, more_layers_probability,
+    def __init__(self, input_shape, output_layer, more_layers_probability,
                  max_layers=10, genome=None):
         self.more_layers_probability = more_layers_probability
         self.input_shape = input_shape
         self.output_layer = output_layer
-        self.architecture_type = architecture_type
         self.max_layers = max_layers
         """
         self.X = X
@@ -97,8 +96,9 @@ class NNGenome:
             self.input_layer = genome[0]
 
     def generateInputLayer(self):
-        layer = generate_layer(self.architecture_type)
-        if self.architecture_type == 1:
+        layer_type = np.random.choice((LayerType.FULLY_CONNECTED, LayerType.CONVOLUTIONAL)).value
+        layer = generate_layer(layer_type)
+        if layer_type == 1:
             layer[1] = np.prod(self.input_shape)
         return layer
 
@@ -137,5 +137,7 @@ class NNGenome:
                 return layer[NNArrayStructure.ACTIVATION_FUNCTION.value]
 
     def __str__(self):
-        return self.genome
+        return str(self.genome)
 
+    def __repr__(self):
+        return self.__str__()

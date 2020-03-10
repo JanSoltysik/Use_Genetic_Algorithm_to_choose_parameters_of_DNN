@@ -237,8 +237,6 @@ class NNOptimize:
             rnd_layer_elem_type = possible_elements[rnd_ind]
 
         rnd_layer_elem = nn_genome.generate_layer_elem[rnd_layer_elem_type.value]()
-        print(rnd_layer_elem_type)
-        print(rnd_layer_elem)
 
         # we can't get invalid rnd_layer_elem
         if rnd_layer_elem_type != NNArrayStructure.DROPOUT_RATE:
@@ -249,7 +247,6 @@ class NNOptimize:
             if next_layer[0] == LayerType.DROPOUT.value:
                 next_layer[NNArrayStructure.DROPOUT_RATE.value - 1] = rnd_layer_elem
             else:
-                print('adding drop')
                 nn_genome_tmp = nn_list[:layer_ind + 1]
                 new_dropout_layer = [LayerType.DROPOUT.value, 0, 0, 0, 0, 0, 0, rnd_layer_elem]
                 nn_genome_tmp.append(new_dropout_layer)
@@ -296,6 +293,7 @@ class NNOptimize:
                             if i != j and distance_matrix[(i, j)] < similarity_treshold and (i, j) != max_pair)
 
         if count_similar > self.max_similar_models:
+            irint(type(nn_list), nn_list)
             return True
 
         return False

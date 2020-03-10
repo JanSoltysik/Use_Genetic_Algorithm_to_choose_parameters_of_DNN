@@ -72,7 +72,7 @@ def get_keras_model(nn_list, input_shape):
     return model
 
 
-def partialy_train(nn_list, X, y, training_epochs, validation_split, verbose=2, final_train=False):
+def partialy_train(nn_list, X, y, training_epochs, validation_split, verbose=0, final_train=False):
     input_shape = X.shape[1:]
     model = get_keras_model(nn_list, input_shape)
 
@@ -83,7 +83,7 @@ def partialy_train(nn_list, X, y, training_epochs, validation_split, verbose=2, 
     if final_train:
         return model
     else:
-        return max(history.history["val_acc"]), model.count_params()
+        return max(history.history["val_accuracy"]), model.count_params()
 
 
 def test_building_on_fashion_mnist():

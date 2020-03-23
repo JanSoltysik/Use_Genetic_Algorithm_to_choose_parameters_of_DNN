@@ -4,3 +4,11 @@ venv
 __pycache__/
 v1/*.py
 v1/
+*.xcf
+*.toc
+*.xml
+*.blg
+*.log
+*.bcf
+*.bbl
+*.aux

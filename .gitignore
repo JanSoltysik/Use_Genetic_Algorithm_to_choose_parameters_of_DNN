@@ -12,3 +12,4 @@ v1/
 *.bcf
 *.bbl
 *.aux
+.ipynb_checkpoints/

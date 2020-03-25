@@ -498,6 +498,7 @@ Przykładowy genomem reprezentującym SSN jest:
 	\newline
 	  [5, 0, 0, 0, 0, 0, 0, 0.28], [1, 100, 3, 0, 0, 0, 0, 0], [1, 10, 4, 0, 0, 0, 0, 0]]
 \end{center}
+Dekodując powyższy gneom otrzymujemy sieć złożoną z następujących warstw:\\
 \begin{tabular}{|c|c|c|c|}
 	\hline
 	Typ warstwy & Liczba Neuronów & Funkcja Aktywacji & Współczynnik Porzucenia \\
@@ -510,15 +511,133 @@ Przykładowy genomem reprezentującym SSN jest:
 	Warstwa Gęsta & 10 & Softmax & N/A \\
 	\hline
 \end{tabular}
+\\
+Generując genomy w populacji warstwa pierwsza wyznacza typ SSN(np. jeśli pierwszą warstwą
+jest warstwa gęsta to sieć będzie perceptronem wielowarstwowym, a jeśli pierwszą warstwą
+będzie warstwa splotowa sieć będzie siecią splotową).
+Po każdym wygenerowaniu warstwy ukrytej obliczamy losową liczbę $\rho_l$ według danego
+rozkładu prawdopodobieństwa:
+\begin{equation}
+	\rho_l = 1 - \sqrt{1 - U}
+\end{equation}
+gdzie: $U$ - liczba wylosowana przy pomocy płaskiego rozkładu prawdopodobieństwa. \\
+Wtedy jeśli $\rho_l < \gamma_l$ i wygenerowana warstwa jest zgodna z zasadami przedstawionymi
+w tabeli \textbf{(odniesienie do tabeli)} dodajemy warstwę do genomu. 
+Gdzie $\gamma_l$ - zdefiniowane przez użytkownika prawdopodobieństwo dodawania nowej warstwy.
+Dodawanie kończymy jeśli przekroczymy maksymalną liczbę warstw lub $\rho_l$ $\geq$ $\gamma_l$.
 
+\subsection{Funkcja oceny dla SSN}
+Celem algorytmu jest znalezienie sieci $\phi^{*}$ osiągającej jak najlepszy wynik jednocześnie
+ograniczając liczbę trenowalnych parametrów, więc jest to problem optymalizacyjny 
+przedstawiony za pomocą wzoru:
+\begin{equation}
+	\underset{\phi}{\min}\big(p(\phi), w(\phi)\big)
+\end{equation}
+gdzie:\\
+$p(\phi)$ - miara jakości sieci(np. precyzja predykcji),\\
+$w(\phi)$ - liczba trenowalnych parametrów zwana \textbf{rozmiarem sieci}.\\
+Jeżeli jednak chcielibyśmy znaleźć bezpośrednio rozwiązanie powyższego równania
+prowadziłoby to do zadania optymalizacji wieloobiektowej. Aby uprościć to zadanie
+definiujemy funkcję oceny, względem której osobniki w populacji będą porównywane:
+\begin{equation}
+	g(\phi) = (1 - \alpha)p(\phi) + \alpha w(\phi)
+\end{equation}
 
-\subsection{Funkcja kosztu i selekcja}
+Jednak powinniśmy jeszcze przeskalować $p(\phi)$, $w(\phi)$ aby ich wartości były podobnego 
+rzędu. Niech $\vec{p} = \{p(\phi_1), ..., p(\phi_n)\}$ będzie wektorem ocen aktualnej populacji,
+wtedy po znormalizowaniu $\vec{p}^{*} = \frac{\vec{p}}{||\vec{p}||}$ zakres wartości ocen sieci
+będzie z przedziału $p^{*}(\phi_i) \in [0, 1]$ dla każdego $i$. Niech $\mathcal{A}$ oznacza
+maksymalną liczbę warstw w sieci, oraz $\mathcal{N}$ oznacza maksymalną liczbę neuronów w 
+warstwie wtedy maksymalna wartość rozmiaru sieci jest równa $\mathcal{W}$.
+\textbf{skonczyć}.\\
+Odpowiednio przeskalowana funkcja oceny wyrażona jest wzorem:
+\begin{equation}
+	g(\phi) = 10(1 - \alpha)p^{*} + \alpha w^{*}(\phi)
+\end{equation}
+
+\subsection{Selekcja}
+Aby wygenerować $n$ potomków potrzebujemy $2n$ rodziców wybranych z bieżącej populacji.
+Do tego celu wykonamy odmianę \textbf{binarnej selekcji turniejowej}:\\
+\begin{algorithm}[H]
+ \KwIn{Aktualna generacja $\mathcal{C}(t)$.}
+ \KwOut{Najlepiej przystosowani osobnicy z populacji.}
+ Niech $\mathcal{P}$ - zbiór rodziców.\\
+ Wybierz losowo $m$ rodziców gdzie $m < n$.\\
+ \While{nie wybrano 2n rodziców} {
+	Porównaj parami wybrane genomy, lepiej przystosowany dodaj do $\mathcal{P}$.\\
+ }
+ \caption{Binarna selekcja turniejowa dla SSN.}
+\end{algorithm}
+W powyższej procedurze im większa wartość $m$ tym większe jest prawdopodobieństwo wybrania
+najlepszych osobników jako rodzica.
 
 \subsection{Krzyżowanie}
+Ponieważ standardowe operatory genetyczne nie będą działać dla zmodyfikowanego kodowania
+genomy, je również trzeba zmodyfikować. Wybranym krzyżowaniem jest zmodyfikowane krzyżowanie
+dwupunktowe. Wykonując krzyżowanie musimy pamiętać, że nie każda warstwa może występować po 
+każdej innej. Przykładowa dla dwóch rodziców $S_1$, $S_2$ po wybraniu punktów $(r_1, r_2)$ z 
+$S_1$ i $(r_3, r_4)$ z $S_4$ (gdzie $r_i$ oznacza indeks warstwy), może się stać że warstwa
+$r_3$ nie może być zamieniona z warstwą $r_1$ lub $r_4$ z $r_2$ z powodu niekompatybilności
+z warstwą poprzednią \textbf{odniesienie do tabeli}.\\
+\begin{algorithm}[H]
+	\KwIn{Dwa genomy $S_1$, $S_2$.}
+	\KwOut{Nowy potomek $S_3$.}
+	Losowo wybierz dwa punkty z $S_1$ gdzie $r_1 \leq r_2$.\\
+	\If{$r_1$ = $r_2$} {
+		$r_2$ = \text{len}($S_1$) - 1
+	}
+	Znajdź wszystkie pary punktów $(r_3, r_4)_i$ w $S_2$ kompatybilne z $(r_1, r_2)$,
+	gdzie $r_3 < r_4$ i $(r_4 - r_3) - (r_2 - r_1) < \mathcal{A}$.\\
+	Losowo wybierz jedną z par $(r_3, r_4)_i$.\\
+	W $S_1$ zastąp warstwy z przedziału $[r_1, r_2]$ warstwami z przedziału $[r_3, r_4]$
+	wzięte z $S_2$. Nowy genom oznacz jako $S_3$.\\
+	Skoryguj funkcję aktywacyjne $S_3$ aby były zgodne z funkcjami $S_1$.\\
+	\caption{Krzyżowanie dwupunktowe dla SSN.}
+\end{algorithm}
+\textbf{[DODAJ PRZYKŁAD]}.
 
 \subsection{Mutacja}
+Mimo że mutacja nie jest potrzebna w mikro-AG, została ona dodana aby jeszcze bardziej
+zróżnicować modele i potencjalnie zwiększyć szanse na otrzymanie lepszych rozwiązań.
+Zmodyfikowana operacja mutacji jest bardzo podobna do swojej klasycznej wersji.
+Każdy model z populacji potomków może podlec mutacji przy prawdopodobieństwie $\rho_m$, wtedy:
+\begin{itemize}
+	\item Losowo wybierz jedną z warstw, a następnie zmień jeden z jej używanych parametrów
+		zgodnie z tabelą \textbf{odniesienie do niej}.
+	\item Zmień funkcję aktywacji, a następnie skoryguj funkcję w pozostałych warstwach 
+	oprócz ostatniej.
+	\item Dodaj warstwę porzucenia jeśli jest ona kompatybilna z zmienianą warstwą.
+\end{itemize}
 
 \subsection{Warunek końca}
+W Algorytmie Genetycznym może dojść do sytuacji w której zmiany w kolejnych pokoleniach są
+niezauważalne, wtedy bez konsekwencji można zakończyć aktualny przebieg algorytmu. Możemy to
+zaimplementować definiując odpowiedni warunek końca. Warunek ten można oprzeć na funkcji oceny
+wiemy jednak że sieci o podobnej strukturze będą miały zbliżone wartości dla tej funkcji.
+Dlatego warunek końca możemy oprzeć definiując \textbf{odległość} między genomami mówiąca nam
+jak zbliżone są do siebie dwie SSN.\\
+Niech $S^{(i)}$ - oznacza $i$-tą warstwę sieci $S$. Wtedy przy założeniu 
+len$(S_2) \geq$ len$(S_1)$
+odległość $d(S_1, S_2)$ miedzy dwoma genomami reprezentującymi SSN możemy obliczyć według 
+algorytmu:
+
+\begin{algorithm}[H]
+	\KwIn{Dwa genomy $S_1$, $S_2$.}
+	\KwOut{Odległość między $S_1$ a $S_2$.}
+	Niech $d = 0$ - odległość między $S_1$ a $S_2$.\\
+	\For{Dla każdego i, gdzie $1 \leq i \leq$ len$(S_1)$} {
+		$d = d + ||S_2^{(i)} - S_1^{(i)}||$.\\
+	}
+	\For{Dla każdego i, gdzie len$(S_1) < i \leq$ len$(S_2)$} {
+		$d = d + ||S_2^{(i)}||$.\\
+	}
+	\caption{Odległość między dwoma SSN.}
+\end{algorithm}
+
+Dla powyższej definicji $d$ jeśli $S_1 = S_2$ to $d(S_1, S_2) = 0$, wiec pozwala nam ona określić
+stopień podobieństwa dwóch osobników.\\
+Aktualny przebieg AG kończymy więc gdy co najmniej $m_c$ par spełnia $d(S_1, S_2) \leq d_t$,
+gdzie zarówno $d_t$ i $m_c$ są hiperparametrami AG.
 
 
 \section{Implementacja}

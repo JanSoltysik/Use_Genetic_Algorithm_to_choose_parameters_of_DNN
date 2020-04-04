@@ -29,13 +29,13 @@ class NNArrayStructure(enum.Enum):
 
 MAX_VALUE_FOR_ARRAY_ELEMENT = {
     NNArrayStructure.LAYER_TYPE: 5,
-    NNArrayStructure.NUMBER_OF_NEURONS: 1024 / 8,  # final value equals (8 * picked number)
+    NNArrayStructure.NUMBER_OF_NEURONS: 50,  # final value equals (8 * picked number)
     NNArrayStructure.ACTIVATION_FUNCTION: 4,
-    NNArrayStructure.NUMBERS_OF_FILTERS: 512 / 8,  # same as above
-    NNArrayStructure.KERNEL_SIZE: 6,  # final value equals 3^(picked number)
-    NNArrayStructure.KERNEL_STRIDE: 6,
-    NNArrayStructure.POOLING_SIZE: 6,  # final value equals 2^(picked number)
-    NNArrayStructure.DROPOUT_RATE: 0.7,
+    NNArrayStructure.NUMBERS_OF_FILTERS: 10,  # same as above
+    NNArrayStructure.KERNEL_SIZE: 2,  # final value equals 3^(picked number)
+    NNArrayStructure.KERNEL_STRIDE: 3,
+    NNArrayStructure.POOLING_SIZE: 3,  # final value equals 2^(picked number)
+    NNArrayStructure.DROPOUT_RATE: 0.5,
 }
 
 NN_STACKING_RULES = {

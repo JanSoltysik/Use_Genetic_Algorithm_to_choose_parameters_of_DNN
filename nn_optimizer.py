@@ -1,7 +1,9 @@
 import copy
 import numpy as np
+import tqdm
 import nn_genome
 import build_model
+from tensorflow import keras
 from building_rules import LayerType, ActivationFunction, NN_STACKING_RULES, \
     NNArrayStructure, ELEMENTS_FROM_ARRAY_USED_BY_LAYER
 
@@ -89,7 +91,7 @@ class NNOptimize:
     def __init__(self, problem_type=1, architecture_type=1, cross_validation_ratio=0.4,
                  mutation_probability=0.4, add_more_layers_prob=0.5, nn_size_scaler=0.5,
                  population_size=10, tournament_size=10, max_similar_models=3, training_epochs=10,
-                 max_generations=10, total_experiments=5, max_layers=10):
+                 max_generations=10, total_experiments=5, max_layers=5):
         self.problem_type = problem_type if problem_type in (1, 2) else 1
         self.architecture_type = architecture_type if architecture_type in (1, 2) else 1
         self.cross_validation_ratio = cross_validation_ratio
@@ -141,7 +143,7 @@ class NNOptimize:
         norm_scale = np.linalg.norm(performance_score)
         map(lambda score: score / norm_scale, performance_score)
 
-        fitness = 10 * (1 - self.nn_size_scaler) * np.array(performance_score) +\
+        fitness = 10 * (1 - self.nn_size_scaler) * np.array(performance_score) + \
                   self.nn_size_scaler * np.array(weights)
 
         return fitness, np.argmin(fitness)
@@ -281,28 +283,22 @@ class NNOptimize:
         if max_distance == 0:
             return True
 
-        count_similar = 0
         normalize_fn = np.vectorize(lambda d: d / max_distance)
         distance_matrix = normalize_fn(distance_matrix)
-        """
-        for i, j in indices:
-            if i != j and distance_matrix[(i, j)] < similarity_treshold and (i, j) != max_pair:
-                count_similar += 1
-        """
         count_similar = sum(1 for i, j in indices
                             if i != j and distance_matrix[(i, j)] < similarity_treshold and (i, j) != max_pair)
 
         if count_similar > self.max_similar_models:
-            irint(type(nn_list), nn_list)
             return True
 
         return False
 
     def find_best_model(self, X, y, labels=None):
         best_models = []
-
         nb_of_classes = max(y) + 1 if not labels else labels
-        for _ in range(self.total_experiments):
+
+        generation_counter = tqdm.tqdm(range(self.max_generations), desc="Generation")
+        for i, _ in enumerate(tqdm.tqdm(range(self.total_experiments), desc="Total Experiments")):
             population = self.generate_initial_population(X.shape[1:], nb_of_classes)
             best_model = None
             best_fitness = float("inf")
@@ -317,8 +313,12 @@ class NNOptimize:
                 population = self.crossover_population(parents)
                 self.mutate_population(population)
 
+                generation_counter.update()
                 if self.is_generation_similar(population):
                     break
+
+            if i < self.total_experiments - 1:
+                generation_counter.reset()
 
             best_models.append((best_model, best_fitness))
 
@@ -329,43 +329,9 @@ class NNOptimize:
         print(f"Best model: {best_model}\nWith fitness = {best_fitness}")
 
         model = build_model.partialy_train(best_model.genome, X, y, self.training_epochs * 5,
-                                           self.cross_validation_ratio, verbose=1, final_train=True)
+                                           self.cross_validation_ratio, verbose=0, final_train=True)
 
+        model.fit(X, y, epochs=100, validation_split=self.cross_validation_ratio,
+                  callbacks=[keras.callbacks.EarlyStopping(restore_best_weights=True)])
         return model
 
-
-if __name__ == "__main__":
-    op = NNOptimize(population_size=3, training_epochs=1, tournament_size=2, max_generations=2, total_experiments=2)
-
-    from tensorflow import keras
-
-    (X, y), _ = keras.datasets.fashion_mnist.load_data()
-    X = X / 255.0
-    X = X.reshape((X.shape[0]), 28, 28, 1)
-    """
-    population = op.generate_initial_population(X.shape[1:], 10)
-    fitness, _ = op.get_population_fitness(population, X[:10], y[:10])
-    parents = op.selection(population, fitness)
-    """
-
-    s1 = [[1, 264, 2, 0, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0, 0, 0.65], [1, 464, 2, 0, 0, 0, 0, 0],
-          [5, 0, 0, 0, 0, 0, 0, 0.35], [1, 872, 2, 0, 0, 0, 0, 0], [1, 10, 3, 0, 0, 0, 0, 0]]
-    s2 = [[1, 56, 0, 0, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0, 0, 0.25], [1, 360, 0, 0, 0, 0, 0, 0],
-          [1, 480, 0, 0, 0, 0, 0, 0], [1, 88, 0, 0, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0, 0, 0.2],
-          [1, 10, 3, 0, 0, 0, 0, 0]]
-    # print(create_offspring_from_crossover_points(s1, s2, 1, 3, 2, 4, 2))
-
-    s3 = nn_genome.NNGenome(X.shape[1:], [1, 10, 3, 0, 0, 0, 0, 0], more_layers_probability=0.6, max_layers=7).genome
-    """
-    parents = op.crossover_population(parents)
-
-    print(len(parents))
-    print(op.mutate_population(parents))
-    print("Orginal:", s3)
-    s3_temp = copy.deepcopy(s3)
-    for i in range(len(s3) - 1):
-        print(op.mutation(s3_temp, i), end='\n\n')
-        s3_temp = copy.deepcopy(s3)
-    """
-
-    print(op.find_best_model(X[:10], y[:10]))

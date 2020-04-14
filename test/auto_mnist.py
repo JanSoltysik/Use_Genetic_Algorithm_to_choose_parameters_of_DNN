@@ -1,13 +1,6 @@
-import sys
-import warnings
-
-sys.path.append('./..')
-warnings.filterwarnings("ignore")
-
-
-def run_optimizer_fashion_mnist(alpha=0.5):
-    from tensorflow import keras
+def run_optimizer_fashion_mnist(alpha=1):
     import nn_optimizer
+    from tensorflow import keras
 
     (X_train, y_train), (X_test, y_test) = keras.datasets.mnist.load_data()
     X_train = X_train /255.0
@@ -24,4 +17,8 @@ def run_optimizer_fashion_mnist(alpha=0.5):
 
 
 if __name__ == '__main__':
+    import sys
+    sys.path.append('..')
+    
+
     run_optimizer_fashion_mnist()

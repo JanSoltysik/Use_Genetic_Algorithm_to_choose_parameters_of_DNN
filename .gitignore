@@ -13,3 +13,5 @@ v1/
 *.bbl
 *.aux
 .ipynb_checkpoints/
+test/results
+tags

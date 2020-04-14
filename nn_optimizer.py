@@ -297,7 +297,6 @@ class NNOptimize:
         best_models = []
         nb_of_classes = max(y) + 1 if not labels else labels
 
-        generation_counter = tqdm.tqdm(range(self.max_generations), desc="Generation")
         for i, _ in enumerate(tqdm.tqdm(range(self.total_experiments), desc="Total Experiments")):
             population = self.generate_initial_population(X.shape[1:], nb_of_classes)
             best_model = None
@@ -313,12 +312,9 @@ class NNOptimize:
                 population = self.crossover_population(parents)
                 self.mutate_population(population)
 
-                generation_counter.update()
                 if self.is_generation_similar(population):
                     break
 
-            if i < self.total_experiments - 1:
-                generation_counter.reset()
 
             best_models.append((best_model, best_fitness))
 

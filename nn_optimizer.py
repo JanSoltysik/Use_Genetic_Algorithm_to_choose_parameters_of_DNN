@@ -138,11 +138,13 @@ class NNOptimize:
 
         performance_score, weights = list(zip(*scores))
 
-        map(rescale_size_of_nn, weights)
+        weights = np.array([rescale_size_of_nn(weight) for weight in weights])
 
         norm_scale = np.linalg.norm(performance_score)
-        map(lambda score: score / norm_scale, performance_score)
+        performance_score = np.divide(performance_score, norm_scale)
 
+        print("Perf: ", performance_score)
+        print("Weights: ", weights)
         fitness = 10 * (1 - self.nn_size_scaler) * np.array(performance_score) + \
                   self.nn_size_scaler * np.array(weights)
 

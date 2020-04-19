@@ -138,22 +138,23 @@ class NNOptimize:
 
         performance_score, weights = list(zip(*scores))
 
-        weights = np.array([rescale_size_of_nn(weight) for weight in weights])
-
-        norm_scale = np.linalg.norm(performance_score)
-        performance_score = np.divide(performance_score, norm_scale)
+        norm_weights = np.linalg.norm(weights)
+        # weights = np.array([rescale_size_of_nn(weight) for weight in weights])
+        weights = np.divide(weights, norm_weights)
+        # norm_scale = np.linalg.norm(performance_score)
+        # performance_score = np.divide(performance_score, norm_scale)
 
         print("Perf: ", performance_score)
         print("Weights: ", weights)
         fitness = 10 * (1 - self.nn_size_scaler) * np.array(performance_score) + \
                   self.nn_size_scaler * np.array(weights)
 
-        return fitness, np.argmin(fitness)
+        return fitness, np.argmax(fitness)
 
     def tournament_selection(self, population_with_fitness):
         parents = []
         for ind in range(len(population_with_fitness) // 2):
-            if population_with_fitness[ind * 2][1] < population_with_fitness[ind * 2 + 1][1]:
+            if population_with_fitness[ind * 2][1] > population_with_fitness[ind * 2 + 1][1]:
                 new_parent = population_with_fitness[ind * 2][0]
             else:
                 new_parent = population_with_fitness[ind * 2 + 1][0]
@@ -306,7 +307,7 @@ class NNOptimize:
             for _ in range(self.max_generations):
                 population_fitness, best_model_index = self.get_population_fitness(population, X, y)
 
-                if population_fitness[best_model_index] < best_fitness:
+                if population_fitness[best_model_index] > best_fitness:
                     best_fitness = population_fitness[best_model_index]
                     best_model = population[best_model_index]
 
@@ -317,10 +318,9 @@ class NNOptimize:
                 if self.is_generation_similar(population):
                     break
 
-
             best_models.append((best_model, best_fitness))
 
-        return min(best_models, key=lambda model: model[1])
+        return max(best_models, key=lambda model: model[1])
 
     def fit(self, X, y):
         best_model, best_fitness = self.find_best_model(X, y)
@@ -332,4 +332,3 @@ class NNOptimize:
         model.fit(X, y, epochs=100, validation_split=self.cross_validation_ratio,
                   callbacks=[keras.callbacks.EarlyStopping(restore_best_weights=True)])
         return model
-

@@ -138,9 +138,7 @@ class NNOptimize:
 
         performance_score, weights = list(zip(*scores))
 
-        norm_weights = np.linalg.norm(weights)
-        # weights = np.array([rescale_size_of_nn(weight) for weight in weights])
-        weights = np.divide(weights, norm_weights)
+        weights = np.array([rescale_size_of_nn(weight) for weight in weights])
         # norm_scale = np.linalg.norm(performance_score)
         # performance_score = np.divide(performance_score, norm_scale)
 
@@ -303,7 +301,7 @@ class NNOptimize:
         for i, _ in enumerate(tqdm.tqdm(range(self.total_experiments), desc="Total Experiments")):
             population = self.generate_initial_population(X.shape[1:], nb_of_classes)
             best_model = None
-            best_fitness = float("inf")
+            best_fitness = float("-inf")
             for _ in range(self.max_generations):
                 population_fitness, best_model_index = self.get_population_fitness(population, X, y)
 

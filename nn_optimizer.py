@@ -137,7 +137,8 @@ class NNOptimize:
     def get_population_fitness(self, population, X, y):
         pool = multiprocessing.Pool()
         scores = pool.map(functools.partial(
-                            build_model.partialy_train(X, y, self.training_epochs, self.cross_validation_ratio)),
+                            build_model.partialy_train, X=X, y=y,
+                            training_epochs=self.training_epochs, validation_split=self.cross_validation_ratio),
                             population)
         pool.close()
         pool.join()
@@ -148,8 +149,6 @@ class NNOptimize:
         # norm_scale = np.linalg.norm(performance_score)
         # performance_score = np.divide(performance_score, norm_scale)
 
-        print("Perf: ", performance_score)
-        print("Weights: ", weights)
         fitness = 10 * (1 - self.nn_size_scaler) * np.array(performance_score) + \
                   self.nn_size_scaler * np.array(weights)
 

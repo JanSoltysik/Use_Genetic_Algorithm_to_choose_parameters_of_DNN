@@ -4,7 +4,7 @@ def run_optimizer_classification(alpha=0.2, dataset_name="fashion_mnist"):
     from tensorflow import keras
 
     (X_train, y_train), (X_test, y_test) = \
-        importlib.import_module(f"keras.datasets.{dataset_name}").load_data()
+        importlib.import_module(f"tensorflow.keras.datasets.{dataset_name}").load_data()
     X_train = X_train /255.0
     X_test = X_test / 255.0
 

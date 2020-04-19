@@ -1,4 +1,6 @@
 import copy
+import functools
+import multiprocessing
 import numpy as np
 import tqdm
 import nn_genome
@@ -133,8 +135,12 @@ class NNOptimize:
                 for _ in range(self.population_size)]
 
     def get_population_fitness(self, population, X, y):
-        scores = [build_model.partialy_train(genome.genome, X, y, self.training_epochs, self.cross_validation_ratio)
-                  for genome in population]
+        pool = multiprocessing.Pool()
+        scores = pool.map(functools.partial(
+                            build_model.partialy_train(X, y, self.training_epochs, self.cross_validation_ratio)),
+                            population)
+        pool.close()
+        pool.join()
 
         performance_score, weights = list(zip(*scores))
 
@@ -324,7 +330,7 @@ class NNOptimize:
         best_model, best_fitness = self.find_best_model(X, y)
         print(f"Best model: {best_model}\nWith fitness = {best_fitness}")
 
-        model = build_model.partialy_train(best_model.genome, X, y, self.training_epochs * 5,
+        model = build_model.partialy_train(best_model, X, y, self.training_epochs * 5,
                                            self.cross_validation_ratio, verbose=0, final_train=True)
 
         model.fit(X, y, epochs=100, validation_split=self.cross_validation_ratio,

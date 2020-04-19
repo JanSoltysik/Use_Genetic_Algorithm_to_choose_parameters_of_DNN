@@ -72,7 +72,8 @@ def get_keras_model(nn_list, input_shape):
     return model
 
 
-def partialy_train(nn_list, X, y, training_epochs, validation_split, verbose=0, final_train=False):
+def partialy_train(genome, X, y, training_epochs, validation_split, verbose=0, final_train=False):
+    nn_list = genome.genome
     input_shape = X.shape[1:]
     model = get_keras_model(nn_list, input_shape)
 

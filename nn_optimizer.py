@@ -146,18 +146,23 @@ class NNOptimize:
         performance_score, weights = list(zip(*scores))
 
         weights = np.array([rescale_size_of_nn(weight) for weight in weights])
-        # norm_scale = np.linalg.norm(performance_score)
-        # performance_score = np.divide(performance_score, norm_scale)
+
+        performance_score = np.subtract(performance_score, -1)
+        norm_scale = np.linalg.norm(performance_score)
+        performance_score = np.divide(performance_score, norm_scale)
+
+        print(performance_score)
+        print(weights)
 
         fitness = 10 * (1 - self.nn_size_scaler) * np.array(performance_score) + \
                   self.nn_size_scaler * np.array(weights)
 
-        return fitness, np.argmax(fitness)
+        return fitness, np.argmin(fitness)
 
     def tournament_selection(self, population_with_fitness):
         parents = []
         for ind in range(len(population_with_fitness) // 2):
-            if population_with_fitness[ind * 2][1] > population_with_fitness[ind * 2 + 1][1]:
+            if population_with_fitness[ind * 2][1] < population_with_fitness[ind * 2 + 1][1]:
                 new_parent = population_with_fitness[ind * 2][0]
             else:
                 new_parent = population_with_fitness[ind * 2 + 1][0]
@@ -306,11 +311,11 @@ class NNOptimize:
         for i, _ in enumerate(tqdm.tqdm(range(self.total_experiments), desc="Total Experiments")):
             population = self.generate_initial_population(X.shape[1:], nb_of_classes)
             best_model = None
-            best_fitness = float("-inf")
+            best_fitness = float("inf")
             for _ in range(self.max_generations):
                 population_fitness, best_model_index = self.get_population_fitness(population, X, y)
 
-                if population_fitness[best_model_index] > best_fitness:
+                if population_fitness[best_model_index] < best_fitness:
                     best_fitness = population_fitness[best_model_index]
                     best_model = population[best_model_index]
 
@@ -323,7 +328,7 @@ class NNOptimize:
 
             best_models.append((best_model, best_fitness))
 
-        return max(best_models, key=lambda model: model[1])
+        return min(best_models, key=lambda model: model[1])
 
     def fit(self, X, y):
         best_model, best_fitness = self.find_best_model(X, y)

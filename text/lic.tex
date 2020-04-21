@@ -32,8 +32,10 @@
 
 \subsection{Algorytm Genetyczny}
 Algorytmy genetyczne są to algorytmy poszukiwania zainspirowane mechanizmem doboru naturalnego
-oraz dziedziczności. Łączą w sobie ewolucyjną zasadę przeżycia najlepiej przystosowanych 
-osobników z systematyczną, choć zrandomizowaną wymianą informacji. W każdym pokoleniu powstaje
+oraz dziedziczności. Łączą w sobie  zasadę przeżycia najlepiej przystosowanych 
+osobników z systematyczną, choć zrandomizowaną wymianą informacji wprowadzoną przez
+operatory genetyczne takie jak krzyżowanie i mutacja, które również zainspirowane są
+przyrodą. W każdym pokoleniu powstaje
 nowy zespół sztucznych organizmów, utworzonych z połączenia fragmentów najlepiej przystosowanych
 przedstawicieli poprzedniego pokolenia. Oprócz tego sporadycznie wyporóbowuje się nową część 
 składową. Element losowości nie oznacza że algorytmy genetyczne sprowadzają się do zwykłego
@@ -48,43 +50,71 @@ pseudokodu \cite{ams}:\\
 \begin{algorithm}[H]
  \SetAlgoLined
  \KwIn{Funkcja oceny $f(\vec{x})$}
+ \KwData{$\vec{x}_i(t)$ - $i$-ty osobnik z generacji nr. $t$(najczęściej reprezentowany jako
+ 	 ciąg znaków), $n_x$ - wymiar każdego osobnika}
  \KwOut{Wektor $\hat{\vec{x}}$ dla którego $f(\hat{\vec{x}})$ jest lokalnym minimum}
  Niech $t = 0$ będzie licznikiem generacji. 
  Wygeneruj $n_x$ - wymiarową populację $\mathcal{C}(0)$, składającą się z n osobników.\\
  \While{Warunek końcowy nie jest prawdziwy}{
 	Oblicz przystosowanie, $f(\vec{x}_i(t))$ każdego osobnika $\vec{x}_i(t)$ z populacji.\\
-	Zastosuj operatory genetyczne oby stworzyć potomstwo.\\
-	Wybierz nową populację. $\mathcal{C}(t + 1)$.\\
+	W celu stworzenia potomstwa do najlepiej przystosowanych osobników zastosuj operatory
+	genetyczne np. krzyżowanie i mutacja.\\
+	Z nowo powstałych osobników stwórz nową populację $\mathcal{C}(t + 1)$.\\
 	Przejdź do nowej generacji. $t = t + 1$.\\
  }
  \caption{Podstawowy Algorytm genetyczny}
 \end{algorithm}
 
 \subsubsection{Podstawowa reprezentacja}
-W elementarnym AG osobniki nazywane \textbf{genomami} reprezentujemy za pomocą ciągów bitów.
+Jednym z następstw inspiracji biologicznych AG jest słownictwo zaczerpnięte 
+z genetyki którym będę się posługiwać w tej pracy.
+Osobniki występujące w populacji nazywane są \textbf{chromosomami} lub \textbf{genomami}.
+Idąc dalej w terminologii biologicznej chromosom składa się z \textbf{genów}, które mogą
+występować w pewnej zadanej liczbie odmian, zwaną \textbf{allelami}, wyodrębnia się również
+umiejscowienie genu - \textbf{locus}.
+Materiał genetyczny składa się zazwyczaj z jednego lub więcej chromosomów, zespół ten nazywamy
+\textbf{genotypem}\cite{goldberg}.
+Poniższa tabela przedstawia używane przeze mnie odpowiedniki:
+\begin{center}
+\begin{tabular}{|c|c|}
+	\hline
+	Genetyka & Algorytmy Genetyczne\\
+	\hline
+	chromosom/genom & osobnik w populacji\\
+	gen & składowe osobnika\\
+	allel & możliwe warianty składowych\\
+	locus & pozycja składowej\\
+	genotyp & zespół osobników\\
+	\hline
+\end{tabular}
+\end{center}
+
+W elementarnym AG \textbf{genom} reprezentujemy za pomocą ciągów bitów, więc \textbf{genami}
+będą pojedyncze bity.
 Poniżej znajduję się przykładowy genom:\\
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=1.0]{genome.png}
+\includegraphics[scale=0.20]{genome_v2.png}
 \caption{Przykładowy genom o długości 10.}
 \end{figure}
 
 Transformacja naszego problemu do opisu w postaci ciągów binarnych jest często bardzo trudne, a
-czasami wręcz niemożliwe. Lecz trud ten jest opłacalny ponieważ dla tak opisanych genomów mamy
-zdefiniowane operatory genetyczne których poprawność jest dowiedziona matematyczne. Natomiast w
-przypadku użycia innej reprezentacji osobników musimy zdefiniować własne operatory oraz nie mamy
-pewności co do ich efektywności.
+czasami wręcz niemożliwa. Lecz trud ten jest opłacalny ponieważ dla tak opisanych genomów mamy
+zdefiniowane operatory genetyczne które wykonując proste obliczenia zbliżają nasze osobniki do
+optymalnego rozwiązania.
 
 \subsubsection{Selekcja}
-Jest to etap algorytmu w którym wybieramy poszczególne genomy które później zostaną poddane operatorom genetycznym.
+Jest to etap algorytmu w którym oceniamy osobników przy pomocy funkcji określonej przez
+rozwiązywany przez nas problem, a następnie lepiej ocenione chromosomy mają większe 
+prawdopodobieństwo aby zostały poddane operatorom genetycznym.
 Aby opisać ten proces musimy zdefiniować przedstawioną w \textbf{Algorytmie 1} funkcję oceny 
 $f$.\\
 \textbf{Funkcja oceny/przystosowania} $f$ jest obliczana dla każdego osobnika i pozwala nam
 porównać które genomy są najlepiej przystosowane do zadania które optymalizujemy.\\
 Najprostszym przykładem będzie zadanie znalezienia maximum funkcji 
-$g(x_1, ..., x_n)$ gdzie $n \in \mathbb{N}^{+}$, wtedy funkcja przystosowania
-będzie równa wartości funkcji $g$, im większa wartość $g$ tym osobnik jest
+$f(x_1, ..., x_n)$ gdzie $n \in \mathbb{N}^{+}$, wtedy funkcja przystosowania
+będzie równa wartości funkcji $f$, im większa wartość $f$ tym osobnik jest
 lepiej przystosowany.\\\\
 Istnieje wiele metod selekcji lecz zdecydowanie najpopularniejszą jest \textbf{metoda ruletki}
 w której prawdopodobieństwo $p_i$
@@ -98,48 +128,50 @@ $f_i$ - wartość funkcji oceny dla $i$-tego genomu, $N$ - rozmiar populacji.\\
 
 \subsubsection{Krzyżowanie}
 Jednym z dwóch podstawowych operacji wykonywanych w celu stworzenia potomstwa obecnej populacji
-jest \textbf{krzyżowanie}, które inspiruję się rozmnażaniem płciowym w biologi
-\textbf{[Wikipedia]}.
+jest \textbf{krzyżowanie}, które inspiruję się rozmnażaniem płciowym w biologi \cite{cross}.
 
-W literaturze możemy znaleźć wiele rodzai tej operacji, poniżej znajdują się najpopularniejsze
+W literaturze możemy znaleźć wiele rodzajów tej operacji, poniżej znajdują się najpopularniejsze
 odmiany:
 \begin{itemize}
 \item \textbf{Krzyżowanie jednopunktowe}:\\
 W tej odmianie potomka tworzymy z dwóch wybranych przez selekcję rodziców a następnie 
-losujemy punkt $l$ z przedziału $[0, n_x)$. Potomek wartości na pozycjach $[0, l)$
-przyjmuje wartości z pierwszego rodzica, natomiast na pozycjach $[l, n_x)$ z drugiego.
+losujemy liczbę naturalną  $l$ ze zbioru $\{0,1,\ldots, n_x\}$.
+Potomek wartości na pierwszych $l+1$ pozycjach przyjmuje geny pierwszego rodzica
+a na pozostałych z drugiego rodzica.
 \begin{figure}[H]
 \centering
-\includegraphics[scale=5.0]{crossover.png}
-\caption{Krzyżowanie jednopunktowe, gdzie $n_x = 10$ i $l = 4$.}
+\includegraphics[scale=0.2]{crossover_v2.png}
+\caption{Krzyżowanie jednopunktowe, gdzie $n_x = 10$ i $l = 5$.}
 \end{figure}
 
 \item \textbf{Krzyżowanie dwupunktowe}:\\
-Sposób ten jest zbliżony do opisanego wyżej lecz zamiast jednego punktu losujemy dwa
-$l_1, l_2 \in [0, n_x)$, gdzie $l_1 < l_2$. Potomek natomiast przyjmuje wartości z pierwszego
-rodzica poza elementami na pozycjach $[l_1, l_2)$ gdzie wstawiamy elementy z drugiego.
+Sposób ten jest zbliżony do opisanego wyżej lecz zamiast jednego punktu losujemy dwie liczby
+naturalne $l_1, l_2$ ze zbioru $\{0,1,\ldots, n_x\}$, gdzie $l_1 < l_2$.
+Potomek natomiast przyjmuje wartości z pierwszego rodzica poza elementami na pozycjach od
+$l_1$ do $l_2 - 1$ gdzie wstawiamy elementy z drugiego.
 
 \begin{figure}[H]
 \centering
-\includegraphics[scale=5.0]{two_crossover.png}
+\includegraphics[scale=0.2]{two_crossover_v2.png}
 \caption{Krzyżowanie dwupunktowe, gdzie $n_x = 10$, $l_1 = 4$ i $l_2 = 7$.}
 \end{figure}
 
 Krzyżowania tego rodzaju można uogólnić na operacje gdzie losujemy k-punktów
 a potomek naprzemiennie pobiera wartości z rodziców.\\
 \item \textbf{Krzyżowanie równomierne}:\\
-Potomek każdy element jest wybierany z obu rodziców z takim równym prawdopodobieństwem.
-(Można również wybrać inny stosunek prawdopodobieństw).
+Potomek jest również tworzony przy pomocy dwóch rodziców gdzie każdy jego element jest
+wybierany losowo z pierwszego lub drugiego rodzica z jednakowym prawdopodobieństwem 
+(lub wybranym innym stosunkiem prawdopodobieństw).
 
 \end{itemize}
 
 \subsubsection{Mutacja}
-Operator ten w klasycznej wersji algorytmu polega na zamienieniu wartości znajdującej się na 
-losowo wybranej pozycji z bardzo małym prawdopodobieństwem $\sigma_m$(np. 0.2\%).
+Operator ten w klasycznej wersji algorytmu polega na zamianie zadanej wartości genu
+(0 na 1 lub 1 na 0) z bardzo małym  prawdopodobieństwem $\sigma_m$(np. 0.2\%).
 \begin{figure}[H]
 \centering
-\includegraphics[scale=1.0]{mutation.png}
-\caption{Podstawowa mutacja dla genomu o $n_x = 10$ i wylosowanej pozycji 3.}
+\includegraphics[scale=0.2]{mutation_v2.png}
+\caption{Podstawowa mutacja dla genomu o $n_x = 10$ i wylosowanej pozycji 6.}
 \end{figure}
 
 

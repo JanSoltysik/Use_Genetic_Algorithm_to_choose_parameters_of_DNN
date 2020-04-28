@@ -5,6 +5,7 @@ import numpy as np
 import tqdm
 import nn_genome
 import build_model
+import building_rules
 from tensorflow import keras
 from building_rules import LayerType, ActivationFunction, NN_STACKING_RULES, \
     NNArrayStructure, ELEMENTS_FROM_ARRAY_USED_BY_LAYER

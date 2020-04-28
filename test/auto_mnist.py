@@ -20,5 +20,11 @@ def run_optimizer_classification(alpha=0.2, dataset_name="fashion_mnist"):
 
 if __name__ == '__main__':
     import sys
+    import logging
+    import tensorflow as tf
+    logger = tf.get_logger()
+    logger.setLevel(logging.ERROR)
     sys.path.append('..')
+
+
     run_optimizer_classification()

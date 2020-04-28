@@ -5,6 +5,8 @@
 \usepackage[ruled,vlined]{algorithm2e}
 \usepackage{indentfirst}
 \usepackage{amssymb}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage[margin=1.3in]{geometry}
 
 \usepackage{graphicx}
 \usepackage{float}
@@ -434,7 +436,7 @@ częściowe}.
 \begin{algorithm}[H]
  \SetAlgoLined
  \KwData{Treningowy i walidacyjny zbiór danych $\mathcal{D}_t$, $\mathcal{D}_v$}
- \KwIn{Hiperparametry algorytmu.}
+ \KwIn{Parametry algorytmu.}
  \KwOut{Najlepiej przystosowana SSN $\phi^{*}$}
  \caption{Zmodyfikowany Algorytm Genetyczny wybierający hiperparametry SSN.}
  Niech $t_e = 0$ będzie licznikiem wykonanych przebiegów AG.\\
@@ -460,36 +462,57 @@ częściowe}.
   Najlepszym modelem jest osobnik z $\mathcal{S}$ dla którego funkcja przystosowania
   przyjmuję najniższą wartość.
 \end{algorithm}
-
-\subsection{Reprezentacja SSN w AG}
-Z powodu złożoności SSN musiałem zrezygnować z standardowej reprezentacji osobników 
-jako ciągi binarne. Użytym przeze mnie modelem jest kodowanie oparte na liście tablic tzn.
-każda warstwa sieci jest reprezentowana jako tablica w której każde pole ma z góry określone 
-znaczenie. W tej reprezentacji warstwy przyjmują postać:
-
+Poniżej znajduję się lista parametrów powyższego algorytmu oraz użyte dla nich oznaczenia
+ich rola natomiast zostanie omówiona w kolejnych podrozdziałach.\\
 \begin{center}
-\begin{tabular}{|p{15mm}|p{15mm}|p{15mm}|p{15mm}|p{15mm}|p{15mm}|p{15mm}|p{15mm}|}
+\begin{tabular}{|c|c|}
 	\hline
-	Typ \newline Warstwy & Liczba Neuronów & Funkcja Aktywacji & Liczba Filtrów & Rozmiar Pola Recepcyjnego & Krok Pola Recepcyjnego & Rozmiar Pola Łączącego &  Współczynnik porzucenia \\
+	Nazwa parametru & Oznaczenie \\
+	\hline
+	Współczynnik sprawdzianu krzyżowego & $\gamma_v$ \\
+	Prawdopodobieństwo mutacji & $\rho_m$ \\
+	Prawdopodobieństwo dodania warstwy & $\gamma_l$ \\
+	Maksymalna liczba warstw & $\mathcal{A}$ \\
+	Współczynnik skalowania rozmiaru sieci & $\alpha$ \\
+	Rozmiar populacji & $n$ \\
+	Rozmiar turnieju & $n_t$ \\
+	Dopuszczalne podobne modele & $\gamma_c$\\
+	Liczba epok treningowych & $\gamma_t$\\
+	Liczba generacji & $\gamma_g$\\
+	Liczba eksperymentów & $\gamma_r$\\
 	\hline
 \end{tabular}
+\label{tab:ag}
+\newline
 \end{center}
+
+\subsection{Reprezentacja SSN w AG}
+Z powodu złożoności SSN musiałem zrezygnować ze standardowej reprezentacji osobników 
+jako ciągi binarne. Użytym przeze mnie modelem jest kodowanie oparte na liście tablic tzn.
+każda warstwa sieci jest reprezentowana jako tablica w której każde pole ma z góry określone 
+znaczenie. W tej reprezentacji warstwy przyjmują postać:\\
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.30]{dnn_genome.png}
+\caption{Schemat chromosomu reprezentującego SSN.}
+\end{figure}
 Gdzie każde pole może przyjmować pewien zakres wartości:\\
 \begin{center}
 \begin{tabular}{|c|c|c|}
 	\hline
-	Nazwa pola & Używane Przez & Wartości \\
+	Nr. & Używane Przez & Wartości \\
 	\hline
-	Typ warstwy & Perceptron wielowarstwowy/Sieć splotowa & $x \in \{1, ...,4\}$\\
-	Liczba neuronów & Perceptron wielowarstwowy & $8*x$ dla $x\in \{1, ...,128\}$\\
-	Funkcja aktywacji & Perceptron wielowarstwowy/Sieć splotowa & $x \in \{1, ...,4\}$\\
-	Liczba filtrów & Sieć splotowa & $8*x$ dla $x\in \{1, ...,64\}$\\
-	Rozmiar pola recepcyjnego & Sieć splotowa & $3^x$ dla $x \in \{1, ...,6\}$\\
-	Krok pola recepcyjnego & Sieć splotowa & $x \in \{1, ...,6\}$\\
-	Rozmiar pola łączącego  & Sieć splotowa & $2^x$ dla $x \in \{1, ...,6\}$\\
-	Współczynnik porzucenia & Perceptron wielowarstwowy/Sieć splotowa & $x \in [0, 1]$\\
+	1 & Perceptron wielowarstwowy/Sieć splotowa & $x \in \{1, ...,4\}$\\
+	2 & Perceptron wielowarstwowy & $8*x$ dla $x\in \{1, ...,128\}$\\
+	3 & Perceptron wielowarstwowy/Sieć splotowa & $x \in \{1, ...,4\}$\\
+	4 & Sieć splotowa & $8*x$ dla $x\in \{1, ...,64\}$\\
+	5 & Sieć splotowa & $3^x$ dla $x \in \{1, ...,6\}$\\
+	6 & Sieć splotowa & $x \in \{1, ...,6\}$\\
+	7 & Sieć splotowa & $2^x$ dla $x \in \{1, ...,6\}$\\
+	8 & Perceptron wielowarstwowy/Sieć splotowa & $x \in [0, 1]$\\
 	\hline
 \end{tabular}
+\label{tab:params}
 \end{center}
 
 Osobniki więc będą listą takich tablic.
@@ -500,7 +523,9 @@ typu softmax.
 Generując jednak pozostałe warstwy musimy pamiętać że warstwy nie mogą być ułożone losowo
 (np. nie mogą występować dwie warstwy porzucania po sobie). Poniżej znajdują się odpowiednie
 mapowania typów warstw i funkcji aktywacji na liczby całkowite oraz odpowiednie zasady 
-łączenia warstw w budowanych osobnikach.
+łączenia warstw w budowanych osobnikach.\\
+
+\begin{center}
 \begin{tabular}{|c|c|c|}
 	\hline
 	Typ warstwy & Nazwa & Dozwoleni następcy \\
@@ -511,7 +536,9 @@ mapowania typów warstw i funkcji aktywacji na liczby całkowite oraz odpowiedni
 	4 & Porzucenia & 1, 2 \\
 	\hline
 \end{tabular}
-\quad
+\label{tab:rules}
+\end{center}
+\begin{center}
 \begin{tabular}{|c|c|}
 	\hline
 	Typ funkcji & Nazwa\\
@@ -523,42 +550,72 @@ mapowania typów warstw i funkcji aktywacji na liczby całkowite oraz odpowiedni
 	5 & Liniowa \\
 	\hline
 \end{tabular}
+\end{center}
 
 Dodanie innych typów warstw (np. rekurencyjnych) i funkcji nie powinno być problemem, jedynie
 trzeba pamiętać o dodaniu odpowiednich zasad budowania dla nich.
-Przykładowy genomem reprezentującym SSN jest:
+Przykładowy genomem reprezentującym SSN jest:\\
 \begin{center}
-	[[1, 784, 3, 0, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0, 0, 0.54], [1, 300, 2, 0, 0, 0, 0, 0] 
+
+	$\big[$[1, 784, 3, 0, 0, 0, 0, 0], [4, 0, 0, 0, 0, 0, 0, 0.54], 
+	\newline 
+	\quad [1, 300, 3, 0, 0, 0, 0, 0], [4, 0, 0, 0, 0, 0, 0, 0.28], 
+	\newline 
+	[1, 100, 3, 0, 0, 0, 0, 0], [1, 10, 4, 0, 0, 0, 0, 0]$\big]$
 	\newline
-	  [5, 0, 0, 0, 0, 0, 0, 0.28], [1, 100, 3, 0, 0, 0, 0, 0], [1, 10, 4, 0, 0, 0, 0, 0]]
+
 \end{center}
 Dekodując powyższy gneom otrzymujemy sieć złożoną z następujących warstw:\\
+\begin{center}
 \begin{tabular}{|c|c|c|c|}
 	\hline
-	Typ warstwy & Liczba Neuronów & Funkcja Aktywacji & Współczynnik Porzucenia \\
+	Typ warstwy & Liczba Neuronów & Funkcja Aktywacji & Wsp. Porzucenia \\
 	\hline
-	Warstwa Gęsta & 784 & ReLU & N/A \\
-	Warstwa porzucania & N/A & N/A & 0.54\\
-	Warstwa Gęsta & 300 & ReLU & N/A \\
-	Warstwa porzucania & N/A & N/A & 0.28\\
-	Warstwa Gęsta & 100 & ReLU & N/A \\
-	Warstwa Gęsta & 10 & Softmax & N/A \\
+	Gęsta & 784 & ReLU & N/A \\
+	Porzucanie & N/A & N/A & 0.54\\
+	Gęsta & 300 & ReLU & N/A \\
+	Porzucanie & N/A & N/A & 0.28\\
+	Gęsta & 100 & ReLU & N/A \\
+	Gęsta & 10 & Softmax & N/A \\
 	\hline
 \end{tabular}
-\\
+\end{center}
+
+
+\subsection{Generowanie w populacji początkowej}
 Generując genomy w populacji warstwa pierwsza wyznacza typ SSN(np. jeśli pierwszą warstwą
 jest warstwa gęsta to sieć będzie perceptronem wielowarstwowym, a jeśli pierwszą warstwą
 będzie warstwa splotowa sieć będzie siecią splotową).
-Po każdym wygenerowaniu warstwy ukrytej obliczamy losową liczbę $\rho_l$ według danego
-rozkładu prawdopodobieństwa:
-\begin{equation}
-	\rho_l = 1 - \sqrt{1 - U}
-\end{equation}
-gdzie: $U$ - liczba wylosowana przy pomocy płaskiego rozkładu prawdopodobieństwa. \\
-Wtedy jeśli $\rho_l < \gamma_l$ i wygenerowana warstwa jest zgodna z zasadami przedstawionymi
-w tabeli \textbf{(odniesienie do tabeli)} dodajemy warstwę do genomu. 
-Gdzie $\gamma_l$ - zdefiniowane przez użytkownika prawdopodobieństwo dodawania nowej warstwy.
-Dodawanie kończymy jeśli przekroczymy maksymalną liczbę warstw lub $\rho_l$ $\geq$ $\gamma_l$.
+Warstwa wejściowa i wyjściowa dla każdego osobnika jest taka sama ponieważ
+są one zależne od danych na jakich trenujemy oraz od zadania jakie ma nasza sieć wykonywać
+(klasyfikacja lub regresja), dlatego w populacji początkowej musimy losowo generować tylko
+warstwy ukryte.
+Proces generowania możemy określić przy pomocy pseudokodu:\\
+\newline
+\begin{algorithm}[H]
+	\KwOut{Zainicjalizowana populacja początkowa $\mathcal{C}(0)$.}
+	Niech $\mathcal{C}(0)$ oznacza populację początkową wielości
+	$n$, gdzie chromosomy tej populacji możemy oznaczyć przez $\vec{x}_i$.\\
+	\For{Dla każdego i, gdzie $1 \leq i \leq$ $n$} {
+		Dla wszystkich warstw poza wyjściową (która ma z góry określoną 
+		funkcję aktywacji) losujemy funkcję aktywacji $f$.\\
+		\While{Liczba warstw $\vec{x_i} \leq \mathcal{A}$} {
+			Wylosuj typ warstwy a następnie wartości używanych przez nią 
+			parametrów.\\
+			Wylosuj liczbę $U$ przy pomocy płaskiego rozkładu prawdopodobieństwa
+			z przedziału $[0, 1]$.\\
+			Oblicz $\rho_l = 1 - \sqrt{1 - U}$.\\
+			\If{$\rho_l < \gamma_l$}{
+				Jeśli wygenerowana warstwa jest kompatybilna w warstwą
+				poprzednią dodaj ją do chromosomu.\\
+			}
+			\Else{
+				Kończymy dodawanie warstw dla $\vec{x}_i$.\\
+			}
+		}
+	}
+	\caption{Generowanie populacji początkowej.}
+\end{algorithm}
 
 \subsection{Funkcja oceny dla SSN}
 Celem algorytmu jest znalezienie sieci $\phi^{*}$ osiągającej jak najlepszy wynik jednocześnie
@@ -568,10 +625,10 @@ przedstawiony za pomocą wzoru:
 	\underset{\phi}{\min}\big(p(\phi), w(\phi)\big)
 \end{equation}
 gdzie:\\
-$p(\phi)$ - miara jakości sieci(np. precyzja predykcji),\\
+$p(\phi)$ - miara jakości sieci(np. błąd predykcji),\\
 $w(\phi)$ - liczba trenowalnych parametrów zwana \textbf{rozmiarem sieci}.\\
 Jeżeli jednak chcielibyśmy znaleźć bezpośrednio rozwiązanie powyższego równania
-prowadziłoby to do zadania optymalizacji wieloobiektowej. Aby uprościć to zadanie
+prowadziłoby to do zadania optymalizacji wielokryterialnej. Aby uprościć to zadanie
 definiujemy funkcję oceny, względem której osobniki w populacji będą porównywane:
 \begin{equation}
 	g(\phi) = (1 - \alpha)p(\phi) + \alpha w(\phi)
@@ -582,11 +639,16 @@ rzędu. Niech $\vec{p} = \{p(\phi_1), ..., p(\phi_n)\}$ będzie wektorem ocen ak
 wtedy po znormalizowaniu $\vec{p}^{*} = \frac{\vec{p}}{||\vec{p}||}$ zakres wartości ocen sieci
 będzie z przedziału $p^{*}(\phi_i) \in [0, 1]$ dla każdego $i$. Niech $\mathcal{A}$ oznacza
 maksymalną liczbę warstw w sieci, oraz $\mathcal{N}$ oznacza maksymalną liczbę neuronów w 
-warstwie wtedy maksymalna wartość rozmiaru sieci jest równa $\mathcal{W}$.
-\textbf{skonczyć}.\\
-Odpowiednio przeskalowana funkcja oceny wyrażona jest wzorem:
+warstwie wtedy maksymalna wartość rozmiaru sieci jest równa $w(\phi) = \mathcal{N}^2\mathcal{A}$.
+Ponieważ chcemy aby sieci o podobne rozmiarowi sieci miały podobną wartość $w(\phi)$ dlatego
+ostatnie trzy cyfry rozmiaru na zera otrzymując $w'(\phi)$. Następnie aby skalami zbliżyć się do 
+wartości ocen w tym celu wyznaczamy $w^{*}(\phi) = \log_{10}w'(\phi)$ (rozmiaru sieci
+nie normalizujemy podobnie jak wartości ocen ponieważ chcemy aby różnica w rozmiarze
+miała większe wpływ na różnice w funkcji ocen), co nam daję wartości
+rzędu $\log_{10}(\mathcal{N}^2\mathcal{A})$.\\
+Wtedy odpowiednio przeskalowana funkcja oceny wyrażona jest wzorem:
 \begin{equation}
-	g(\phi) = 10(1 - \alpha)p^{*} + \alpha w^{*}(\phi)
+	g(\phi) = \log_{10}(\mathcal{N}^2\mathcal{A})(1 - \alpha)p^{*} + \alpha w^{*}(\phi)
 \end{equation}
 
 \subsection{Selekcja}
@@ -607,12 +669,12 @@ najlepszych osobników jako rodzica.
 
 \subsection{Krzyżowanie}
 Ponieważ standardowe operatory genetyczne nie będą działać dla zmodyfikowanego kodowania
-genomy, je również trzeba zmodyfikować. Wybranym krzyżowaniem jest zmodyfikowane krzyżowanie
+genomów, je również trzeba zmodyfikować. Wybranym krzyżowaniem jest zmodyfikowane krzyżowanie
 dwupunktowe. Wykonując krzyżowanie musimy pamiętać, że nie każda warstwa może występować po 
 każdej innej. Przykładowa dla dwóch rodziców $S_1$, $S_2$ po wybraniu punktów $(r_1, r_2)$ z 
 $S_1$ i $(r_3, r_4)$ z $S_4$ (gdzie $r_i$ oznacza indeks warstwy), może się stać że warstwa
 $r_3$ nie może być zamieniona z warstwą $r_1$ lub $r_4$ z $r_2$ z powodu niekompatybilności
-z warstwą poprzednią \textbf{odniesienie do tabeli}.\\
+z warstwą poprzednią \ref{tab:rules}.\\
 \begin{algorithm}[H]
 	\KwIn{Dwa genomy $S_1$, $S_2$.}
 	\KwOut{Nowy potomek $S_3$.}
@@ -621,14 +683,49 @@ z warstwą poprzednią \textbf{odniesienie do tabeli}.\\
 		$r_2$ = \text{len}($S_1$) - 1
 	}
 	Znajdź wszystkie pary punktów $(r_3, r_4)_i$ w $S_2$ kompatybilne z $(r_1, r_2)$,
-	gdzie $r_3 < r_4$ i $(r_4 - r_3) - (r_2 - r_1) < \mathcal{A}$.\\
+	gdzie $r_3 < r_4$ i $len(S_1) + (r_4 - r_3) - (r_2 - r_1) < \mathcal{A}$
+	(sprawdzamy czy nie przekraczamy maksymalnej liczby warstw).\\
 	Losowo wybierz jedną z par $(r_3, r_4)_i$.\\
 	W $S_1$ zastąp warstwy z przedziału $[r_1, r_2]$ warstwami z przedziału $[r_3, r_4]$
 	wzięte z $S_2$. Nowy genom oznacz jako $S_3$.\\
-	Skoryguj funkcję aktywacyjne $S_3$ aby były zgodne z funkcjami $S_1$.\\
+	W $S_3$ zmień w warstwach wziętych z $S_2$ funkcję aktywacji, na funkcję 
+	używaną w warstwach wziętych z  $S_1$.
 	\caption{Krzyżowanie dwupunktowe dla SSN.}
 \end{algorithm}
-\textbf{[DODAJ PRZYKŁAD]}.
+Operacja ta dla dwóch poniższych chromosomów będzie przebiegać następująco \cite{ams}:\\
+\begin{center}
+
+	$S_1 = \big[$[1, 784, 2, 0, 0, 0, 0, 0], [4, 0, 0, 0, 0, 0, 0, 0.54], 
+	            \newline 
+	            [1, 300, 2, 0, 0, 0, 0, 0], [4, 0, 0, 0, 0, 0, 0, 0.28], 
+		    \newline 
+		    [1, 100, 2, 0, 0, 0, 0, 0], [1, 10, 4, 0, 0, 0, 0, 0]$\big]$
+	\newline
+	\newline
+	$S_2 = \big[$[1, 64, 1, 0, 0, 0, 0, 0], [4, 0, 0, 0, 0, 0, 0, 0.22],
+		    \newline
+		    [1, 333, 1, 0, 0, 0, 0, 0], [1, 420, 1, 0, 0, 0, 0, 0],
+		    \newline
+		    [1, 77, 1, 0, 0, 0, 0, 0], [4, 0, 0, 0, 0, 0, 0, 0.44],
+		    \newline
+		    [1, 10, 4, 0, 0, 0, 0, 0]$\big]$
+	\newline
+\end{center}
+Dla $r_1 = 1$ i $r_2 = 3$ zbiór wszystkich możliwych par $(r_3, r_4)_i$ dla $S_1$ i $S_2$ wynosi:
+\begin{equation*}
+	[(0,2),(0,4),(0,5),(1,2),(1,4),(1,5),(2,4),(2,5),(4,5)]
+\end{equation*}
+Zakładając że wylosowaliśmy punkty $(2,4)$ potomek $S_3$ po wykonanej operacji krzyżowania
+jest równy:
+\begin{center}
+	$S_3 = \big[$[1, 784, 2, 0, 0, 0, 0, 0], [1, 333, 2, 0, 0, 0, 0, 0], 
+	            \newline 
+	            [1, 420, 2, 0, 0, 0, 0, 0], [1, 77, 2, 0, 0, 0, 0, 0], 
+		    \newline 
+		    [1, 100, 3, 0, 0, 0, 0, 0], [1, 10, 4, 0, 0, 0, 0, 0]$\big]$
+\end{center}
+Jak widzimy funkcje aktywacji w warstwach pobranych z $S_2$ zostały zamienione na funkcję
+używaną w $S_1$.\\
 
 \subsection{Mutacja}
 Mimo że mutacja nie jest potrzebna w mikro-AG, została ona dodana aby jeszcze bardziej
@@ -637,10 +734,10 @@ Zmodyfikowana operacja mutacji jest bardzo podobna do swojej klasycznej wersji.
 Każdy model z populacji potomków może podlec mutacji przy prawdopodobieństwie $\rho_m$, wtedy:
 \begin{itemize}
 	\item Losowo wybierz jedną z warstw, a następnie zmień jeden z jej używanych parametrów
-		zgodnie z tabelą \textbf{odniesienie do niej}.
-	\item Zmień funkcję aktywacji, a następnie skoryguj funkcję w pozostałych warstwach 
+		zgodnie z tabelą \ref{tab:params}.
+	\item Zmień funkcję aktywacji, a następnie skoryguj ją w pozostałych warstwach 
 	oprócz ostatniej.
-	\item Dodaj warstwę porzucenia jeśli jest ona kompatybilna z zmienianą warstwą.
+	\item Dodaj warstwę porzucenia jeśli może ona występować po zmienianej warstwie.[tab]
 \end{itemize}
 
 \subsection{Warunek końca}
@@ -671,11 +768,78 @@ algorytmu:
 Dla powyższej definicji $d$ jeśli $S_1 = S_2$ to $d(S_1, S_2) = 0$, wiec pozwala nam ona określić
 stopień podobieństwa dwóch osobników.\\
 Aktualny przebieg AG kończymy więc gdy co najmniej $m_c$ par spełnia $d(S_1, S_2) \leq d_t$,
-gdzie zarówno $d_t$ i $m_c$ są hiperparametrami AG.
+gdzie zarówno $d_t$ i $m_c$ są parametrami AG.
 
 
 \section{Implementacja}
-
+Do zrealizowania opisanego wyżej AG użyłem języka \texttt{python} wraz z biblioteką 
+implementującą wiele operacji numeryczny \texttt{numpy}, natomiast do budowania i trenowania
+sieci neuronowych wykorzystałem popularną bibliotekę \texttt{tensorflow}. Aby przyśpieszyć
+trenowanie sieci wykorzystałem platformę \texttt{Google Colab}, gdzie korzystając z popularnej
+formy \texttt{jupyter notebooków} mamy darmowy dostęp przez chmurę do karty graficznej
+co znacznie przyśpiesza trenowanie SSN, co znacznie skraca czas wykonania naczego algorytmu.
+Algorytm podzieliłem na cztery programy gdzie każdy wykonuję jedną z funkcji:
+\begin{itemize}
+\item Przechowywanie zasad budowania SSN oraz parametrów potrzebnych do wykonania algorytmu.
+\item Dla danego chromosomu budowanie sieci przy pomocy biblioteki \texttt{tensorflow}, oraz
+zwrócenie oceny oraz wielkości sieci.
+\item Implementacja klasy reprezentującej pojedynczy genom gdzie, która ułatwia implementację
+operację związane z AG.
+\item Implementacja klasy reprezentującej AG gdzie znajdują się funkcję wykonujące algorytmy
+opisane w pseudokodach w rozdziale trzecim.
+\end{itemize}
+Programy opisane są w poniższych podrozdziałach:\\
+\subsection{\texttt{building\_rules.py}}
+Jest to plik pomocniczy który zawiera on typy wyliczeniowe np. \texttt{LayerType}
+zwiększające czytelność kodu, oraz słowniki które:
+\begin{itemize}
+\item opisują maksymalne wartości opisane w tabeli \ref{tab:params}.
+\item zawierają reguły budowania sieci podane w tabeli \ref{tab:rules}.
+\item opisują funkcje aktywacyjne dostępne dla warstwy danego typu.
+\end{itemize}
+\subsection{\texttt{building\_models.py}}
+Program ten zawiera funkcję które dla każdego chromosomu budują sieci neuronowe 
+przy pomocy biblioteki \texttt{tensorflow} która w aktualizacji \texttt{2.0}
+umożliwia budowanie proste modeli przy pomocy modułu \texttt{keras} więc poszczególne 
+rodzaje warstw mają swoje gotowe implementację oraz reguły zaimplementowane w wyżej opisanym
+programie dają nam gwarancję że modele te będą poprawne. Algorytm genetyczny posiada wszystkie
+potrzebne parametry do przeprowadzenia procesu trenowania i zwrócenia potrzebnych dla niego
+wartości tzn oceny wydajności sieci oraz liczby trenowalnych parametrów.
+\subsection{\texttt{nn\_genome.py}}
+W pliku tym znajduję się klasa opakowująca chromosom przy pomocy listy list.
+Język \texttt{python} posiada implementację listy która idealnie nadaję się do AG dla SSN, 
+ponieważ może ona zawierać wartości różnego typu więc może ona np. posiadać jednocześnie
+pole opisujące liczbę neuronów w warstwie, która jest typu całkowitoliczbowego (\texttt{int}),
+oraz pole opisujące współczynnik porzucenia co jest typu zmiennoprzecinkowego 
+(\texttt{float}).
+\subsection{\texttt{nn\_optimizer.py}}
+W pliku tym znajduję się największa liczba operacji przy pomocy klasy \texttt{NNOptimizer}
+implementujemy cały przebieg AG. Interfejs tej klasy inspirowałem biblioteką implementującą
+algorytmy uczenia maszynowego \texttt{scikit-learn} więc aby przeprowadzić proces poszukiwania
+optymalnej sieci neuronowej jedyne co musi zrobić użytkownik to stworzyć instancję podanej
+wyżej klasy do której konstruktora musimy podać typ wykonywanego zadania
+(klasyfikacja lub regresja) oraz ewentualnie parametry opisane w tabeli 
+\ref{tab:ag}, lecz nie jest to obowiązkowe ponieważ posiada ona dla nich wartości domyślne,
+następnie cały algorytm genetyczny oraz finalne wytrenowanie otrzymanej sieci z pełną
+liczbą epok odbywa się przez wywołanie metody \texttt{fit} która pobiera jako argumenty
+dane oraz oczekiwane wartości. Poniżej przykładowe wywołanie programu:\\
+\begin{center}
+\texttt{\# X, y - wczytane wcześniej dane.\\nn\_optimizer.NNOptimizer.fit(X, y)\\}
+\end{center}
+Interfejs ten umożliwia rozwiązanie jakiegoś problemu z użyciem uczenia maszynowego
+nawet jeśli użytkownik nie posiada wiedzy na temat przebiegu algorytmu który dana klasa 
+implementuję.\\
+\newline
+Aby przyśpieszyć wykonywanie AG możemy w każdej generacji budować i trenować 
+modele przy pomocy programu \texttt{building\_models.py} równolegle. Jednak trenowanie tylu
+sieci jednocześnie jest procesem potrzebujących wiele zasobów, więc można tę opcję wyłączyć
+podając wartość argumentu funkcji \texttt{train\_parallel=False} wywołując funkcję 
+\texttt{fit}.
+Równoległość zaimplementowałem przy pomocy wbudowanej biblioteki \texttt{python'a}
+\texttt{multiprocessig} i jej klasy \texttt{Pool}, która posiada
+funkcję \texttt{pool} do której jako argumenty mogę podać funkcję budującą i trenującą 
+SSN oraz populację chromosomów, wtedy dla każdego osobnika zostanie utworzony osobny proces
+i możliwe będzie ich równoległa ewaluacja.
 
 
 \section{Otrzymane wyniki}

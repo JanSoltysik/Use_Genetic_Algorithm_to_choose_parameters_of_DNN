@@ -134,27 +134,35 @@ class NNOptimize:
                                    self.add_more_layers_prob)
                 for _ in range(self.population_size)]
 
-    def get_population_fitness(self, population, X, y):
-        pool = multiprocessing.Pool()
-        scores = pool.map(functools.partial(
-                            build_model.partialy_train, X=X, y=y,
-                            training_epochs=self.training_epochs, validation_split=self.cross_validation_ratio),
-                            population)
-        pool.close()
-        pool.join()
+    def get_population_fitness(self, population, X, y, train_parallel=False):
+        if train_parallel:
+            pool = multiprocessing.Pool()
+            scores = pool.map(functools.partial(
+                                build_model.partialy_train, X=X, y=y,
+                                training_epochs=self.training_epochs,
+                                validation_split=self.cross_validation_ratio),
+                              population)
+            pool.close()
+            pool.join()
+        else:
+            scores = [build_model.partialy_train(genome, X, y,
+                                                 self.training_epochs,
+                                                 self.cross_validation_ratio)
+                      for genome in population]
 
         performance_score, weights = list(zip(*scores))
 
         weights = np.array([rescale_size_of_nn(weight) for weight in weights])
 
         performance_score = np.subtract(1.0, performance_score)
-        print(performance_score)
-        norm_scale = np.linalg.norm(performance_score)
-        performance_score = np.divide(performance_score, norm_scale)
 
-        print(performance_score)
+        max_number_of_neurons = 8 * \
+            building_rules.MAX_VALUE_FOR_ARRAY_ELEMENT[NNArrayStructure.NUMBER_OF_NEURONS]
+        performance_scaler = np.log10(max_number_of_neurons ** 2) * self.max_layers
+        # norm_scale = np.linalg.norm(performance_score)
+        # performance_score = np.divide(performance_score, norm_scale)
 
-        fitness = 10 * (1 - self.nn_size_scaler) * np.array(performance_score) + \
+        fitness = performance_scaler * (1 - self.nn_size_scaler) * np.array(performance_score)+\
                   self.nn_size_scaler * np.array(weights)
 
         return fitness, np.argmin(fitness)

@@ -29,9 +29,9 @@ class NNArrayStructure(enum.Enum):
 
 MAX_VALUE_FOR_ARRAY_ELEMENT = {
     NNArrayStructure.LAYER_TYPE: 5,
-    NNArrayStructure.NUMBER_OF_NEURONS: 64,  # final value equals (8 * picked number)
+    NNArrayStructure.NUMBER_OF_NEURONS: 32,  # final value equals (8 * picked number)
     NNArrayStructure.ACTIVATION_FUNCTION: 4,
-    NNArrayStructure.NUMBERS_OF_FILTERS: 32,  # same as above
+    NNArrayStructure.NUMBERS_OF_FILTERS: 16,  # same as above
     NNArrayStructure.KERNEL_SIZE: 3,  # final value equals 3^(picked number)
     NNArrayStructure.KERNEL_STRIDE: 3,
     NNArrayStructure.POOLING_SIZE: 3,  # final value equals 2^(picked number)

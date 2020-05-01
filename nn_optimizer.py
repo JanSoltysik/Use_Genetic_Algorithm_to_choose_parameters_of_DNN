@@ -2,10 +2,10 @@ import copy
 import functools
 import multiprocessing
 import numpy as np
-import tqdm
 import nn_genome
 import build_model
 import building_rules
+from tqdm.auto import trange
 from tensorflow import keras
 from building_rules import LayerType, ActivationFunction, NN_STACKING_RULES, \
     NNArrayStructure, ELEMENTS_FROM_ARRAY_USED_BY_LAYER
@@ -317,11 +317,11 @@ class NNOptimize:
         best_models = []
         nb_of_classes = max(y) + 1 if not labels else labels
         
-        for i, _ in enumerate(tqdm.trange(self.total_experiments, desc="Total Experiments", possition=1)):
+        for i, _ in enumerate(trange(self.total_experiments, desc="Total Experiments", position=1)):
             population = self.generate_initial_population(X.shape[1:], nb_of_classes)
             best_model = None
             best_fitness = float("inf")
-            for _ in tqdm.trange(self.max_generations, desc="Generation",possition=0):
+            for _ in trange(self.max_generations, desc="Generation",position=0):
                 population_fitness, best_model_index = self.get_population_fitness(population, X, y)
 
                 if population_fitness[best_model_index] < best_fitness:

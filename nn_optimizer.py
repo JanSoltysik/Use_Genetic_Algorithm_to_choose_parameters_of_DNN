@@ -317,7 +317,7 @@ class NNOptimize:
         best_models = []
         nb_of_classes = max(y) + 1 if not labels else labels
         
-        for i, _ in enumerate(tqdm.trange(self.total_experiments, desc="Total Experiments"), possition=1):
+        for i, _ in enumerate(tqdm.trange(self.total_experiments, desc="Total Experiments", possition=1)):
             population = self.generate_initial_population(X.shape[1:], nb_of_classes)
             best_model = None
             best_fitness = float("inf")

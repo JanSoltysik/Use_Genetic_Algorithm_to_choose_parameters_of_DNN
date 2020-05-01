@@ -316,12 +316,12 @@ class NNOptimize:
     def find_best_model(self, X, y, labels=None):
         best_models = []
         nb_of_classes = max(y) + 1 if not labels else labels
-
-        for i, _ in enumerate(tqdm.tqdm(range(self.total_experiments), desc="Total Experiments")):
+        
+        for i, _ in enumerate(tqdm.tqdm(range(self.total_experiments),desc="Total Experiments")):
             population = self.generate_initial_population(X.shape[1:], nb_of_classes)
             best_model = None
             best_fitness = float("inf")
-            for _ in range(self.max_generations):
+            for _ in tqdm.tqdm(range(self.max_generations), desc="Generation"):
                 population_fitness, best_model_index = self.get_population_fitness(population, X, y)
 
                 if population_fitness[best_model_index] < best_fitness:

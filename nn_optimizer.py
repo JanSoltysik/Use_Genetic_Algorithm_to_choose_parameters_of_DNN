@@ -131,7 +131,8 @@ class NNOptimize:
             units_in_output_layer = 1
         output_list = self.getOutputLayer(units_in_output_layer)
 
-        return [nn_genome.NNGenome(input_shape, output_list, architecture_type,
+        return [nn_genome.NNGenome(input_shape, output_list, 
+                                   self.architecture_type,
                                    self.max_layers,
                                    self.add_more_layers_prob)
                 for _ in range(self.population_size)]

@@ -78,7 +78,8 @@ def partialy_train(genome, X, y, training_epochs, validation_split, verbose=0, f
     model = get_keras_model(nn_list, input_shape)
 
     loss_fn = get_output_layer_activation_function(nn_list)
-    model.compile(loss=loss_fn, optimizer="adam", metrics=["accuracy"])
+    metric = "mse" if loss_fn is "mean_squared_error" else "accuracy"
+    model.compile(loss=loss_fn, optimizer="adam", metrics=[metric])
     history = model.fit(X, y, epochs=training_epochs, validation_split=validation_split,
                         verbose=verbose)
     if final_train:

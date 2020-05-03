@@ -155,7 +155,9 @@ class NNOptimize:
 
         weights = np.array([rescale_size_of_nn(weight) for weight in weights])
 
-        performance_score = np.subtract(1.0, performance_score)
+        # get error of prediction if classification problem
+        if problem_type == 1: 
+            performance_score = np.subtract(1.0, performance_score)
 
         max_number_of_neurons = 8 * \
             building_rules.MAX_VALUE_FOR_ARRAY_ELEMENT[NNArrayStructure.NUMBER_OF_NEURONS]

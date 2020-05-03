@@ -85,7 +85,7 @@ def partialy_train(genome, X, y, training_epochs, validation_split, verbose=0, f
     if final_train:
         return model
     else:
-        return max(history.history["val_accuracy"]), model.count_params()
+        return max(history.history["val_" + metric]), model.count_params()
 
 
 def test_building_on_fashion_mnist():

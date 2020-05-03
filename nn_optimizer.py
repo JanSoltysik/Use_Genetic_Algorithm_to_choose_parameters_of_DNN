@@ -91,11 +91,12 @@ def layers_wise_distance_between_genomes(genome_1, genome_2):
 
 
 class NNOptimize:
-    def __init__(self, problem_type=1, cross_validation_ratio=0.4,
+    def __init__(self, problem_type=1, architecture_type=2, cross_validation_ratio=0.4,
                  mutation_probability=0.4, add_more_layers_prob=0.5, nn_size_scaler=0.5,
                  population_size=10, tournament_size=10, max_similar_models=3, training_epochs=10,
                  max_generations=10, total_experiments=5, max_layers=5):
         self.problem_type = problem_type if problem_type in (1, 2) else 1
+        self.architecture_type = problem_type if problem_type in (1, 2) else 2
         self.cross_validation_ratio = cross_validation_ratio
         self.mutation_probability = mutation_probability
         self.add_more_layers_prob = add_more_layers_prob
@@ -130,7 +131,8 @@ class NNOptimize:
             units_in_output_layer = 1
         output_list = self.getOutputLayer(units_in_output_layer)
 
-        return [nn_genome.NNGenome(input_shape, output_list,
+        return [nn_genome.NNGenome(input_shape, output_list, architecture_type,
+                                   self.max_layers,
                                    self.add_more_layers_prob)
                 for _ in range(self.population_size)]
 
@@ -155,7 +157,7 @@ class NNOptimize:
         weights = np.array([rescale_size_of_nn(weight) for weight in weights])
 
         # get error of prediction if classification problem
-        if problem_type == 1: 
+        if self.problem_type == 1: 
             performance_score = np.subtract(1.0, performance_score)
 
         max_number_of_neurons = 8 * \

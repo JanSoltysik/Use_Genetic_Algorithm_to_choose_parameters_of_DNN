@@ -76,10 +76,12 @@ generate_layer_elem = {
 
 
 class NNGenome:
-    def __init__(self, input_shape, output_layer, more_layers_probability,
+    def __init__(self, input_shape, output_layer, architecture_type,
+                 more_layers_probability,
                  max_layers=10, genome=None):
         self.more_layers_probability = more_layers_probability
         self.input_shape = input_shape
+        self.architecture_type = architecture_type
         self.output_layer = output_layer
         self.max_layers = max_layers
         """
@@ -96,7 +98,10 @@ class NNGenome:
             self.input_layer = genome[0]
 
     def generateInputLayer(self):
-        layer_type = np.random.choice((LayerType.FULLY_CONNECTED, LayerType.CONVOLUTIONAL)).value
+        if architecture_type == 1:
+            layer_type = np.random.choice((LayerType.FULLY_CONNECTED, LayerType.CONVOLUTIONAL)).value
+        else:
+            layer_type = LayerType.FULLY_CONNECTED.value
         layer = generate_layer(layer_type)
         if layer_type == 1:
             layer[1] = np.prod(self.input_shape)

@@ -91,12 +91,11 @@ def layers_wise_distance_between_genomes(genome_1, genome_2):
 
 
 class NNOptimize:
-    def __init__(self, problem_type=1, architecture_type=1, cross_validation_ratio=0.4,
+    def __init__(self, problem_type=1, cross_validation_ratio=0.4,
                  mutation_probability=0.4, add_more_layers_prob=0.5, nn_size_scaler=0.5,
                  population_size=10, tournament_size=10, max_similar_models=3, training_epochs=10,
                  max_generations=10, total_experiments=5, max_layers=5):
         self.problem_type = problem_type if problem_type in (1, 2) else 1
-        self.architecture_type = architecture_type if architecture_type in (1, 2) else 1
         self.cross_validation_ratio = cross_validation_ratio
         self.mutation_probability = mutation_probability
         self.add_more_layers_prob = add_more_layers_prob
@@ -125,7 +124,7 @@ class NNOptimize:
         return output_list
 
     def generate_initial_population(self, input_shape, nr_of_classes):
-        if self.architecture_type == 1:
+        if self.problem_type == 1:
             units_in_output_layer = nr_of_classes
         else:
             units_in_output_layer = 1

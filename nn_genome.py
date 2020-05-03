@@ -98,7 +98,7 @@ class NNGenome:
             self.input_layer = genome[0]
 
     def generateInputLayer(self):
-        if architecture_type == 1:
+        if self.architecture_type == 1:
             layer_type = np.random.choice((LayerType.FULLY_CONNECTED, LayerType.CONVOLUTIONAL)).value
         else:
             layer_type = LayerType.FULLY_CONNECTED.value

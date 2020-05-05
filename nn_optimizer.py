@@ -161,6 +161,8 @@ class NNOptimize:
         if self.problem_type == 1: 
             performance_score = np.subtract(1.0, performance_score)
 
+        performance_score = np.divide(performance_score, np.linalg.norm(performance_score))
+
         max_number_of_neurons = 8 * \
             building_rules.MAX_VALUE_FOR_ARRAY_ELEMENT[NNArrayStructure.NUMBER_OF_NEURONS]
         performance_scaler = np.log10(max_number_of_neurons ** 2) * self.max_layers
@@ -321,11 +323,11 @@ class NNOptimize:
         best_models = []
         nb_of_classes = max(y) + 1 if not labels else labels
         
-        for i, _ in enumerate(trange(self.total_experiments, desc="Total Experiments", position=1)):
+        for _ in trange(self.total_experiments, desc="Total Experiments", position=1):
             population = self.generate_initial_population(X.shape[1:], nb_of_classes)
             best_model = None
             best_fitness = float("inf")
-            for _ in trange(self.max_generations, desc="Generation",position=0):
+            for _ in range(self.max_generations):
                 population_fitness, best_model_index = self.get_population_fitness(population, X, y)
 
                 if population_fitness[best_model_index] < best_fitness:

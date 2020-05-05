@@ -133,8 +133,8 @@ class NNOptimize:
 
         return [nn_genome.NNGenome(input_shape, output_list, 
                                    self.architecture_type,
-                                   self.max_layers,
-                                   self.add_more_layers_prob)
+                                   self.add_more_layers_prob,
+                                   self.max_layers)
                 for _ in range(self.population_size)]
 
     def get_population_fitness(self, population, X, y, train_parallel=False):

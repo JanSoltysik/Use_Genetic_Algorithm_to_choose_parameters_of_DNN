@@ -84,12 +84,7 @@ class NNGenome:
         self.architecture_type = architecture_type
         self.output_layer = output_layer
         self.max_layers = max_layers
-        """
-        self.X = X
-        self.y = y
-        self.validation_split = validation_split
-        self.training_epochs = training_epochs
-        """
+
         self.input_layer = self.generateInputLayer()
         if not genome:
             self.genome = [self.input_layer, *self.generateHiddenLayers(), self.output_layer]
@@ -103,7 +98,7 @@ class NNGenome:
         else:
             layer_type = LayerType.FULLY_CONNECTED.value
         layer = generate_layer(layer_type)
-        if layer_type == 1:
+        if self.architecture_type == 1 and layer_type == 1:
             layer[1] = np.prod(self.input_shape)
         return layer
 
@@ -133,7 +128,6 @@ class NNGenome:
                 break
 
             added_layers += 1
-
         return hidden_layers
 
     def getActivationFunction(self):

@@ -32,9 +32,9 @@ MAX_VALUE_FOR_ARRAY_ELEMENT = {
     NNArrayStructure.NUMBER_OF_NEURONS: 128,  # final value equals (8 * picked number)
     NNArrayStructure.ACTIVATION_FUNCTION: 4,
     NNArrayStructure.NUMBERS_OF_FILTERS: 64,  # same as above
-    NNArrayStructure.KERNEL_SIZE: 6,  # final value equals 3^(picked number)
+    NNArrayStructure.KERNEL_SIZE: 4,  # final value equals 3^(picked number)
     NNArrayStructure.KERNEL_STRIDE: 6,
-    NNArrayStructure.POOLING_SIZE: 6,  # final value equals 2^(picked number)
+    NNArrayStructure.POOLING_SIZE: 4,  # final value equals 2^(picked number)
     NNArrayStructure.DROPOUT_RATE: 0.5,
 }
 

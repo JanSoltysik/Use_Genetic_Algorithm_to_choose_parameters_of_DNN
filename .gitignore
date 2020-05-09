@@ -12,6 +12,8 @@ v1/
 *.bcf
 *.bbl
 *.aux
+*.out
+*.png
 .ipynb_checkpoints/
 test/results
 tags

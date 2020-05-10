@@ -29,6 +29,22 @@
 
 
 \section{Wstęp}
+W ostatnich latach sieci neuronowe i uczenie głębokie  są tematem numer jeden w świeci
+informatyki. Jest to jednak stosunkowo stara dyscyplina ponieważ jej początek sięga roku 1943 
+w którym został zaprezentowany model pojedynczego perceptronu.\\
+Jednak dopiero w latach dwutysięcznych zaczęła ona pokazywać swój prawdziwy potencjał.
+Przyczyniło się do tego wiele czynników m.in. rozwój technologi, ogólnodostępne duże pokłady
+danych itd. Wiele firm  zaczyna to wykorzystawać wprowadzając różnego 
+rodzaju zastosowania dla SSN np. Tesla i samoprowadzące się samochody, system rekomendacji 
+filmów na platformie Netflix, filtry spam w skrzynkach e-mail, boty uczącę się grać w gry
+z OpenAI  i wiele wiele innych.\\
+Zbudowanie jednak sieci składającej się z dużej ilości warstw nie jest jednak proste. 
+Dlatego zaczęto opracowywać metody automatycznego budowania sieci neuronowych. 
+Metody te umożliwiają osobom niezaznajomionym z uczeniem maszynowym na korzystanie z SSN. Jednym
+z możliwych podjeść są Algorytmy Genetyczne, które podobnie jak SSN nie są wynalazkiem
+ostatnich lat (rok 1960 John Holland). Znajdują one jednak wciąż nowe zastosowania.\\
+Tematem tej pracy będzie implementacja Algorytmu Genetycznego w celu znalezienia optymalnej
+struktury sieci neuronowej.
 
 
 \section{Wprowadzenie teoretyczne}
@@ -65,7 +81,7 @@ pseudokodu \cite{ams}:\\
 	Z nowo powstałych osobników stwórz nową populację $\mathcal{C}(t + 1)$.\\
 	Przejdź do nowej generacji. $t = t + 1$.\\
  }
- \caption{Podstawowy Algorytm genetyczny}
+ \caption{\label{alg:ag}Podstawowy Algorytm genetyczny}
 \end{algorithm}
 
 \subsubsection{Podstawowa reprezentacja}
@@ -74,11 +90,11 @@ z genetyki którym będę się posługiwać w tej pracy.
 \textbf{Fenotypem} nazywamy  układ złożony z pewnej liczby parametrów opisujących cechy
 rozwiązania. 
 Osobniki występujące w populacji nazywane są \textbf{genotypami}, które 
-składają się z zakodowanej wersji opisanych dla fenotypu parametrów parametrów. 
-Konkretną zakodowana cecha (parametr) nazywana jest \textbf{genem}. Każdy gen może przyjmować 
+składają się z zakodowanej wersji opisanych dla fenotypu parametrów. 
+Konkretna zakodowana cecha (parametr) nazywana jest \textbf{genem}. Każdy gen może przyjmować 
 różne wartości, które nazywane są \textbf{allelami}. Pozycję na jakiej znajduję się gen nazywamy
 \textbf{locusem}. \textbf{Chromosomem} nazywamy uporządkowanym zestawem genów.
-Opisany wyże genotyp składa się z jednego lub więcej genotypów.\cite{goldberg}.
+Opisany wyżej genotyp składa się z jednego lub więcej genotypów.\cite{goldberg}.
 
 Poniższa tabela przedstawia używane przeze mnie odpowiedniki:
 \begin{table}[H]
@@ -116,8 +132,8 @@ optymalnego rozwiązania.
 Selekcja jest to etap algorytmu w którym wybieramy poszczególne genotypy które później zostaną 
 poddane operatorom genetycznym. Celem tej operacji jest wybranie najlepiej przystosowanych
 osobników do utworzenia nowej populacji.
-Aby opisać ten proces musimy zdefiniować przedstawioną w \textbf{Algorytmie 1} funkcję oceny 
-$f$.\\
+Aby opisać ten proces musimy zdefiniować przedstawioną w [\hyperref[alg:ag]{Alg. 1}]
+funkcję oceny $f$.\\
 \textbf{Funkcja oceny/przystosowania} $f$ jest obliczana dla każdego osobnika i pozwala nam
 porównać które genotypy są najlepiej przystosowane do zadania które optymalizujemy.\\
 Najprostszym przykładem będzie zadanie znalezienia maximum funkcji 
@@ -129,7 +145,7 @@ funkcji oceny i różnych metod selekcji wybierana jest pula "najlepszych osobni
 Istnieje wiele metod selekcji lecz zdecydowanie najpopularniejszą jest \textbf{metoda ruletki}
 w której prawdopodobieństwo $p_i$
 wybrania $i$-tego genotypu do reprodukcji kolejnego pokolenia jest proporcjonalne do wartości
-funkcji przystosowania i jest równe:
+funkcji przystosowania. Prawdopodobieństwo to jest równe:\\
 \begin{equation}
 	p_i = \frac{f_i}{\sum_{j=1}^{N} f_j}
 \end{equation}
@@ -158,7 +174,7 @@ a na pozostałych od drugiego.
 Sposób ten jest zbliżony do opisanego wyżej lecz zamiast jednego punktu losujemy dwie liczby
 naturalne $l_1, l_2$ ze zbioru $\{1,\ldots, n_x\}$, gdzie $l_1 < l_2$.
 Potomek natomiast przyjmuje wartości z pierwszego rodzica poza elementami na pozycjach od
-$l_1$ do $l_21$ gdzie wstawiamy elementy z drugiego.
+$l_1$ do $l_2$ gdzie wstawiamy elementy z drugiego.
 
 \begin{figure}[H]
 \centering
@@ -177,11 +193,11 @@ wybierany losowo z pierwszego lub drugiego rodzica z jednakowym prawdopodobieńs
 
 \subsubsection{Mutacja}
 Operator ten w klasycznej wersji algorytmu polega na zamianie zadanej wartości bitu
-(0 na 1 lub 1 na 0) z bardzo małym  prawdopodobieństwem $\sigma_m$(np. 0.2\%).
+(0 na 1 lub 1 na 0) z bardzo małym  prawdopodobieństwem $\sigma_m$(np. 0.02\%).
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.2]{mutation_v2.png}
-\caption{Podstawowa mutacja dla genotypu o $n_x = 10$ i wylosowanej pozycji 6.}
+\caption{Podstawowa mutacja dla genotypu o $n_x = 10$ i wylosowanej pozycji 7.}
 \end{figure}
 
 
@@ -192,7 +208,7 @@ Podobnie jak dla Algorytmów Genetycznych, inspiracją dla Sztucznych Sieci Neur
 była biologia a dokładniej budowa neuronów naturalnych znajdujących się w ciele człowieka.
 Sztuczne sieci neuronowe zostały wymyślone już w w pierwszej połowie XX wieku, lecz dopiero w ostatnich latach
 dzięki rozwojowi technologi oraz dostępności do olbrzymiej ilości danych mogliśmy zacząć używać
-ich pełnego potencjału. SSN są przykładem techniki \textbf{uczenia nadzorowanego} tzn.
+ich pełny potencjał. SSN są przykładem techniki \textbf{uczenia nadzorowanego} tzn.
 podczas uczenia sieci podajemy mu dane ze znanymi wynikami i poprzez porównywanie wygenerowanych
 wyników z rzeczywistymi nasza sieć uczy się generować poprawne wyniki.
 
@@ -240,8 +256,8 @@ Wagi są aktualizowane według wzoru \cite{um}:
 \end{equation}
 gdzie:\\
 $\hat{y_j}$ - otrzymany wynik na $j$-tym wyjściu,\\
-$y_j$ - docelowy wynik $j$-tego neuronu,\\
-$\eta$ - współczynnik uczenia.\\
+$y_j$ - docelowy wynik $j$-tego wyjścia,\\
+$\eta \in$ (0, 1] - współczynnik uczenia.\\
 Perceptron jednak nie nadaje się do skomplikowanych zadań ponieważ przez swoją prostą budowę
 jest jedynie zdolny do klasyfikowania danych które są liniowo separowalne.
 
@@ -284,6 +300,7 @@ jest \textbf{wsteczna propagacja}. Cały proces możemy przedstawić za pomocą 
 \end{algorithm}}
 Średni błąd może być przestawiony przez wzór:
 \begin{equation}
+\label{wz:4}
 	d = \frac{1}{2}(\vec{y} - \hat{\vec{y}})^2
 \end{equation}
 Podczas aktualizowania wag wybieramy te wartości dla których średni błąd jest najmniejszy, możemy
@@ -317,10 +334,11 @@ Wtedy postępujemy według kroków:\\
 	\hat{o'} &= \sigma(o)
 \end{split}
 \end{align}
-\item Kolejnym krokiem jest obliczenie błędu $d_o$ według wzoru (4). 
+\item Kolejnym krokiem jest obliczenie błędu $d_o$ według wzoru (\hyperref[wz:4]{4}). 
 \item Teraz rozpoczyna się etap propagacji wstecznej błędu, najpierw propagujemy błąd
-do wag łączących warstwę ukrytą z warstwą wyjściową, wagi w sieci zmieniamy przy pomocy wzoru:
+do wag łączących warstwę ukrytą z warstwą wyjściową, wagi w sieci aktualizujemy przy pomocy wzoru:
 \begin{equation}
+\label{wz:8}
 	w_{ij} = w_{ij} - \eta \pdv{d_o}{w_{ij}^{(2)}}
 \end{equation}
 Korzystając z reguły łańcuchowej wiemy że dla wag łączących warstwę ukrytą z warstwą wyjściową
@@ -337,7 +355,7 @@ Ponieważ wiemy, że powyższe pochodne są równe:
 \end{split}
 \end{align}
 gdzie: $o$ - oczekiwana wartość na wyjściu.\\
-Regułę modyfikacji wag podanych w wzorze (8) możemy uprościć do postaci w której
+Regułę modyfikacji wag podanych w wzorze (\hyperref[wz:8]{8}) możemy uprościć do postaci w której
 wszystkie poprzednie wartości wcześniej policzyliśmy:
 \begin{equation}
 	w_{ij}^{(2)} = w_{ij}^{(2)} - \eta(\hat{o'} - o)\hat{o'}(1 - \hat{o'})\hat{h_i}
@@ -345,7 +363,7 @@ wszystkie poprzednie wartości wcześniej policzyliśmy:
 \item Dla wag łączących warstwę wejściową z ukrytą pochodna $\pdv{d_o}{w_{ij}^{(1)}}$,
 korzystając z reguły łańcuchowej otrzymujemy:
 \begin{equation}
-	\pdv{d_o}{w_{ij}^{(2)}} = \pdv{d_o}{\hat{o'}}\pdv{\hat{o'}}{o'}\pdv{o'}{\hat{h_j}}
+	\pdv{d_o}{w_{ij}^{(1)}} = \pdv{d_o}{\hat{o'}}\pdv{\hat{o'}}{o'}\pdv{o'}{\hat{h_j}}
 	                          \pdv{\hat{h_j}}{h_j}\pdv{h_j}{w_{ij}^{(1)}}
 \end{equation}
 Pierwsze dwie pochodne policzyliśmy wcześniej pozostałe trzy są równe:
@@ -353,7 +371,7 @@ Pierwsze dwie pochodne policzyliśmy wcześniej pozostałe trzy są równe:
 \begin{split}
 	\pdv{o'}{\hat{h_j}} &= w_{j1}^{(2)} \\
 	\pdv{\hat{h_j}}{h_j} &= \hat{h_j}(1 - \hat{h_j})\\
-	\pdv{h_j}{x_i} &= x_i
+	\pdv{h_j}{w_{ij}^{(1)}} &= x_i
 \end{split}
 \end{align}
 Ostateczny wzór na modyfikację wag $w_{ij}^{(1)}$ jest więc równy:
@@ -363,7 +381,7 @@ Ostateczny wzór na modyfikację wag $w_{ij}^{(1)}$ jest więc równy:
 \end{equation}
 \end{enumerate}
 Dla sieci z większą liczbą warstw ukrytych wzory modyfikacji wag dzięki regule łańcuchowej
-rozrastałyby się o kolejne człony w sposób analogiczny jak powyżej.\\
+rozrastałyby się o kolejne człony w sposób analogiczny jak w powyższym przykładzie.
 
 \subsubsection{Funkcje aktywacyjne}
 \label{sec:fa}
@@ -384,14 +402,14 @@ w przypadku SSN inne funkcje sprawują się lepiej. Przyjmuje ona wartości z za
 \end{equation}
 \item \textbf{funkcja tangensa hiperbolicznego}:\\
 Jest S - kształtna, ciągła i różniczkowalna, podobnie jak funkcja logistyczna, 
-ale zakres wartości wynosi $(-1, 1)$ a nie $(0, 1)$ jak w przypadku funkcji logistycznej
+ale zakres wartości wynosi $(-1, 1)$ a nie $(0, 1)$ jak w przypadku funkcji 
 $\sigma$.
 \begin{equation}
 	\tanh(z) = \frac{e^z - e^{-z}}{e^z + e^{-z}}
 \end{equation}
 \item \textbf{funkcja ReLU}:\\
 Jest ciągłą, ale nieróżniczkowalna dla $z = 0$. W praktyce jednak spisuje się znakomicie 
-dodatkowo jest bardzo szybko obliczana. Aktualnie jest ona oraz jej odmiany są najczęściej
+dodatkowo jest bardzo szybko obliczana. Aktualnie jest ona jak i jej odmiany najczęściej
 używanymi funkcjami aktywacji dla warstw ukrytych i wejściowej. 
 \begin{equation}
 	ReLU(z) = \max(0, z)
@@ -429,7 +447,8 @@ W SSN oprócz \textbf{warstw gęstych} tzn.
 gdzie każdy neuron w $i$-tej warstwie jest połączony z wszystkimi neuronami
 znajdującymi się w warstwie nr. $i+1$,
 używane są warstwy innego typu które pomagają sieciom
-osiągać lepsze wyniki. Oto kilka przykładowych warstw:
+osiągać lepsze wyniki. Rodzaj warstwy też można rozważać jako kolejny
+hiperparametr SSN. Oto kilka przykładowych warstw:
 \begin{itemize}
 \item \textbf{warstwa splotowa}:
 Używane są one w zadaniach wizualnych. Neurony w pierwszej warstwie splotowej nie są
@@ -449,10 +468,10 @@ neuronów poprzedniej warstwy zlokalizowanymi w rzędach od $i \cdot s_h$ do
 $i \cdot s_h + f_h-1$  i kolumnach
 od $j \cdot s_w $ do $j \cdot s_w + f_w-1$
 gdzie: $f_w/f_h$ - szerokość/wysokość pola recepcyjnego, $s_h, s_w$ definiują wartość 
-\textbf{kroków} odpowiednio w kolumnach i rzędach. \textbf{Krok} jest hiperpametrem
-i oznacza odległość
+\textbf{kroków} odpowiednio w kolumnach i rzędach. \textbf{Krok}  oznacza odległość
 pomiędzy dwoma kolejnymi polami recepcyjnymi. Aby uzyskać takie same wymiary 
-dla każdej warstwy najczęściej dodawane są zera wokół wejść.\\
+dla każdej warstwy najczęściej dodawane są zera wokół wejść. Krok i rozmiar pola recepcyjnego
+musi podawać użytkownik tworzący warstwę więc są one kolejnymi hiperparametrami sieci.\\
 
 Wagi neuronu mogą być przedstawione jako niewielki obraz o rozmiarze pola recepcyjnego, 
 hiparapametr ten nazywamy \textbf{filtrem}.
@@ -516,18 +535,25 @@ użyte w moim programie. Z tego samego powodu jedyną opisaną przeze mnie archi
 \subsection{Modyfikacja AG}
 SSN posiadają dużą liczbę hiperparametrów i wpływ każdego z nich na efektywność sieci jest
 zależny od wykonywanego zadania, więc jeżeli wybieramy je ręcznie musimy to robić
-metodą prób i błędów. Ograniczyłem optymalizowane hiperparametry do opisanych w sekcji
-[\hyperref[sec:ssn]{2.2}].
-
-Aby użyć AG to tego zadania musimy zmodyfikować jego tradycyjną odmianę.
+metodą prób i błędów.
+Aby zautomatyzować ten proces wykorzystam w tym celu Algorytm Genetyczny, który porównując
+sieci z różnymi wartościami hiperparametrów wybierze możliwie najlepszą według zadanej 
+metryki. Z powody dużej ilości hiperparamtetrów w SSN musiałem wybrać ich ograniczoną ilość
+(wybrane hiperparametry opisane są w podrozdziale [\hyperref[sec:ssn]{2.2}]).
 Modyfikując AG musimy pamiętać, że będziemy operować na sieciach o różnych rozmiarach, lecz
 użytkownik musi wybrać ich maksymalną liczbę. Musi on też wybrać typ wykonywanego zadania 
 (klasyfikacja lub regresja), ponieważ do każdego typu przypisywana jest inna metryka
-oceny jakości sieci (patrz [\hyperref[sec:ocena]{3.4}]).\\
+oceny jakości sieci (patrz [\hyperref[sec:ocena]{3.4}]).
+Implementując operację krzyżowania i mutacji potrzebne jest uwzględnienie aby tworzyły one
+prawidłowe sieci (wymagana kolejność warstw, liczba warstw nieprzekraczająca maksymalnej
+ patrz [\hyperref[sec:ossn]{3.2}]).
+
+
+Aby użyć AG to tego zadania musimy zmodyfikować jego tradycyjną odmianę.
 Poniżej znajduje się lista wszystkich 
-parametrów powyższego algorytmu oraz użyte dla nich oznaczenia
+parametrów zmodyfikowanego algorytmu oraz użyte dla nich oznaczenia
 ich rola natomiast zostanie omówiona w kolejnych podrozdziałach.
-\begin{table}[!h]
+\begin{table}[H]
 \centering
 \begin{tabular}{|c|c|}
 	\hline
@@ -549,9 +575,6 @@ ich rola natomiast zostanie omówiona w kolejnych podrozdziałach.
 \caption{\label{tab:params}Parametry AG dla SNN.}
 \end{table}
 
-Implementując krzyżowanie i mutację musimy pamiętać aby tworzyły one prawidłowe SSN 
-(wymagana kolejność warstw, liczba warstw nieprzekraczająca maksymalnej
- patrz [\hyperref[sec:ossn]{3.2}]).
 Ponieważ zależy nam na szybkości wykonywanych obliczeń zastosowana została odmiana 
 \textbf{micro-GA} gdzie liczba dozwolonych generacji jest niewielka. Dodatkowo aby przyśpieszyć
 działanie algorytmu SSN są trenowane przez ograniczoną liczbę epok tzw. \textbf{uczenie
@@ -564,14 +587,14 @@ częściowe}.
  \KwOut{Najlepiej przystosowana SSN $\phi^{*}$}
  \caption{Zmodyfikowany Algorytm Genetyczny wybierający hiperparametry SSN.}
  Niech $t_e = 0$ będzie licznikiem wykonanych przebiegów AG.\\
- Niech $\mathcal{S}$ zbiór na najlepsze rozwiązania.\\
+ Niech $\mathcal{S}$ zbiór najlepszych rozwiązań.\\
  \While{$t_e < \gamma_r$}{
  	Niech $t = 0$ będzie licznikiem generacji.\\
 	Stwórz i losowo zainicjalizuj początkową populację $\mathcal{C}(0)$, zawierającą 
 	$n$ osobników, gdzie $n \leq 10$.\\
 	\While{$t<\gamma_g \lor$ warunek wczesnego ko\'nca dla $\mathcal{C}(t)$ nie 
 	       jest spełniony}{
-		Oblicz funkcję przystosowania $f(\phi)$ dla każdego osobnika w populacji.\\
+		Oblicz funkcję przystosowania $c(\phi)$ dla każdego osobnika w populacji.\\
 		Wykonaj selekcję tworząc populację potomstwa $\mathcal{O}(t)$.\\
 		Wykonaj operację krzyżowania i mutacji na osobnikach z $\mathcal{O}(t)$.\\
 		$\mathcal{C}(t + 1) = \mathcal{O}(t)$.\\
@@ -599,21 +622,22 @@ znaczenie. W tej reprezentacji warstwy przyjmują postać:\\
 Dla poszczególnych typów sieci używane są inne pola:\\
 \begin{table}[H]
 \centering
-\begin{tabular}{|c|c|}
+\begin{tabular}{|c|c|c|}
 	\hline
-	Nr. & Używane Przez  \\
+	Nr. & Rodzaje SSN & Rodzaje Warstw\\
 	\hline
-	1 & Perceptron wielowarstwowy/Sieć splotowa\\% & $x \in \{1, ...,4\}$\\
-	2 & Perceptron wielowarstwowy\\%& $8*x$ dla $x\in \{1, ...,128\}$\\
-	3 & Perceptron wielowarstwowy/Sieć splotowa\\%& $x \in \{1, ...,4\}$\\
-	4 & Sieć splotowa \\%& $8*x$ dla $x\in \{1, ...,64\}$\\
-	5 & Sieć splotowa \\%& $3^x$ dla $x \in \{1, ...,6\}$\\
-	6 & Sieć splotowa \\%& $x \in \{1, ...,6\}$\\
-	7 & Sieć splotowa \\%& $2^x$ dla $x \in \{1, ...,6\}$\\
-	8 & Perceptron wielowarstwowy/Sieć splotowa\\ %\& $x \in [0, 1]$\\
+	1 & Perceptron wielowarstwowy/Sieć splotowa & Wszystkie warstwy\\
+	2 & Perceptron wielowarstwowy & Gęsta\\
+	3 & Perceptron wielowarstwowy/Sieć splotowa & Gęsta i Splotowa \\
+	4 & Sieć splotowa & Splotowa\\
+	5 & Sieć splotowa & Splotowa\\
+	6 & Sieć splotowa & Splotowa\\
+	7 & Sieć splotowa & Łącząca\\
+	8 & Perceptron wielowarstwowy/Sieć splotowa & Porzucania\\
 	\hline
 \end{tabular}
-\caption{\label{tab:zakres}Parametry używane przez poszczególne rodzaje sieci.}
+\caption{\label{tab:zakres}Hiperparametry SSN używane przez poszczególne rodzaje sieci i 
+         warstwy.}
 \end{table}
 
 Osobniki więc będą listą takich tablic.
@@ -623,10 +647,10 @@ cyfry wiemy że w warstwie  wyjściowej musi pojawić się 10 neuronów z funkcj
 typu softmax.
 Generując jednak pozostałe warstwy musimy pamiętać że warstwy nie mogą być ułożone losowo
 (np. nie mogą występować dwie warstwy porzucania po sobie). Poniżej znajdują się odpowiednie
-mapowania typów warstw i funkcji aktywacji na liczby całkowite oraz odpowiednie zasady 
+mapowania typów warstw i użytych funkcji aktywacji na liczby całkowite oraz odpowiednie zasady 
 łączenia warstw w generowanych osobnikach.\\
 
-\begin{table}[!h]
+\begin{table}[H]
 \centering
 \begin{tabular}{|c|c|c|}
 	\hline
@@ -640,7 +664,7 @@ mapowania typów warstw i funkcji aktywacji na liczby całkowite oraz odpowiedni
 \end{tabular}
 \caption{\label{tab:rules}Mapowanie typów warstw oraz zasady łączenia warstw.}
 \end{table}
-\begin{table}[!h]
+\begin{table}[H]
 \centering
 \begin{tabular}{|c|c|}
 	\hline
@@ -655,7 +679,11 @@ mapowania typów warstw i funkcji aktywacji na liczby całkowite oraz odpowiedni
 \end{tabular}
 \caption{\label{tab:fun}Mapowanie funkcji aktywacyjnych.}
 \end{table}
-
+Rodzaje filtrów są generowane przez bibliotekę \texttt{tensorflow} w której implementuję 
+powyższy algorytm (patrz rozdział [\hyperref[sec:imp]{4}]).
+Reszta hiperparametrów należy do całkowitych/rzeczywistych z pewnego zadanego przedziału 
+wyspecjalizowanego do danych dla których szukamy optymalnej sieci
+[\hyperref[tab:fm_zakes]{Tab. 9}].\\
 Dodanie innych typów warstw (np. rekurencyjnych) i funkcji nie powinno być problemem, jedynie
 trzeba pamiętać o dodaniu odpowiednich zasad budowania dla nich.
 Przykładowy genotypem reprezentującym SSN jest:\\
@@ -665,7 +693,7 @@ Przykładowy genotypem reprezentującym SSN jest:\\
 	          [1, 100, 3, 0, 0, 0, 0, 0], [1, 10, 4, 0, 0, 0, 0, 0]\big]
 \end{align*}
 Dekodując powyższy genotyp otrzymujemy sieć złożoną z następujących warstw:\\
-\begin{table}[!h]
+\begin{table}[H]
 \centering
 \begin{tabular}{|c|c|c|c|}
 	\hline
@@ -728,7 +756,8 @@ przedstawiony za pomocą wzoru:
 	\underset{\phi}{\min}\big(p(\phi), w(\phi)\big)
 \end{equation}
 gdzie:\\
-$p(\phi)$ - miara jakości sieci(np. błąd predykcji dla klasyfikacji, błąd średniokwadratowy dla regresji),\\
+$p(\phi)$ - miara jakości sieci(np. błąd predykcji dla klasyfikacji, błąd średniokwadratowy 
+\textbf{MSE} dla regresji),\\
 $w(\phi)$ - liczba trenowalnych parametrów zwana \textbf{rozmiarem sieci}.\\
 Jeżeli jednak chcielibyśmy znaleźć bezpośrednio rozwiązanie powyższego równania
 prowadziłoby to do zadania optymalizacji wielokryterialnej. Aby uprościć to zadanie
@@ -765,7 +794,7 @@ Do tego celu wykorzystamy odmianę \textbf{binarnej selekcji turniejowej}:\\
  Wybierz losowo $m$ rodziców gdzie $m < n$.\\
  \While{nie wybrano 2n rodziców} {
 	Porównaj parami wybrane genotypy , lepiej przystosowany dodaj do $\mathcal{P}$.
-	Pary tworzymy przez branie kolejnych dwójek z populacji (np. pierwszy osobnik z 
+	Pary tworzymy przez branie kolejnych dwójek z puli rodziców (np. pierwszy osobnik z 
 	drugim itd.).
  }
  \caption{Binarna selekcja turniejowa dla SSN.}
@@ -778,7 +807,7 @@ Ponieważ standardowe operatory genetyczne nie będą działać dla zmodyfikowan
 genotypów, je również trzeba zmodyfikować. Wybranym krzyżowaniem jest zmodyfikowane krzyżowanie
 dwupunktowe. Wykonując krzyżowanie musimy pamiętać, że nie każda warstwa może występować po 
 każdej innej. Przykładowa dla dwóch rodziców $G_1$, $G_2$ po wybraniu punktów $(r_1, r_2)$ z 
-$S_1$ i $(r_3, r_4)$ z $G_2$ (gdzie $r_i$ oznacza indeks warstwy), może się stać że warstwa
+$G_1$ i $(r_3, r_4)$ z $G_2$ (gdzie $r_i$ oznacza indeks warstwy), może się stać że warstwa
 $r_3$ nie może być zamieniona z warstwą $r_1$ lub $r_4$ z $r_2$ z powodu niekompatybilności
 z warstwą poprzednią [\hyperref[tab:rules]{Tab4}].\\
 \begin{algorithm}[H]
@@ -821,8 +850,8 @@ jest równy:
 	            [1, 420, 2, 0, 0, 0, 0, 0], [1, 77, 2, 0, 0, 0, 0, 0],\\ 
 		    [1, 100, 3, 0, 0, 0, 0, 0], [1, 10, 4, 0, 0, 0, 0, 0]\big]
 \end{align*}
-Jak widzimy funkcje aktywacji w warstwach pobranych z $S_2$ zostały zamienione na funkcję
-używaną w $S_1$.\\
+Jak widzimy funkcje aktywacji w warstwach pobranych z $G_2$ zostały zamienione na funkcję
+używaną w $G_1$.\\
 
 \subsection{Mutacja}
 Mimo że mutacja nie jest potrzebna w mikro-AG, została ona dodana aby jeszcze bardziej
@@ -845,31 +874,33 @@ zaimplementować definiując odpowiedni warunek końca. Warunek ten można oprze
 wiemy jednak że sieci o podobnej strukturze będą miały zbliżone wartości dla tej funkcji.
 Dlatego warunek końca możemy oprzeć definiując \textbf{odległość} między genotypami mówiąca nam
 jak zbliżone są do siebie dwie SSN.\\
-Niech $S^{(i)}$ - oznacza $i$-tą warstwę sieci $S$. Wtedy przy założeniu 
-len$(S_2) \geq$ len$(S_1)$
-odległość $d(S_1, S_2)$ miedzy dwoma genotypy reprezentującymi SSN możemy obliczyć według 
+Niech $G^{(i)}$ - oznacza $i$-tą warstwę sieci $S$. Wtedy przy założeniu 
+len$(G_2) \geq$ len$(G_1)$
+odległość $d(G_1, G_2)$ miedzy dwoma genotypy reprezentującymi SSN możemy obliczyć według 
 algorytmu:
 
 \begin{algorithm}[H]
-	\KwIn{Dwa genotpy $S_1$, $S_2$.}
-	\KwOut{Odległość między $S_1$ a $S_2$.}
-	Niech $d = 0$ - odległość między $S_1$ a $S_2$.\\
-	\For{Dla każdego i, gdzie $1 \leq i \leq$ len$(S_1)$} {
-		$d = d + ||S_2^{(i)} - S_1^{(i)}||$.\\
+	\KwIn{Dwa genotpy $G_1$, $G_2$.}
+	\KwOut{Odległość między $G_1$ a $G_2$.}
+	Niech $d = 0$ - odległość między $G_1$ a $G_2$.\\
+	\For{Dla każdego i, gdzie $1 \leq i \leq$ len$(G_1)$} {
+		$d = d + ||G_2^{(i)} - G_1^{(i)}||$.\\
 	}
-	\For{Dla każdego i, gdzie len$(S_1) < i \leq$ len$(S_2)$} {
-		$d = d + ||S_2^{(i)}||$.\\
+	\For{Dla każdego i, gdzie len$(G_1) < i \leq$ len$(G_2)$} {
+		$d = d + ||G_2^{(i)}||$.\\
 	}
 	\caption{Odległość między dwoma SSN.}
 \end{algorithm}
 
-Dla powyższej definicji $d$ jeśli $S_1 = S_2$ to $d(S_1, S_2) = 0$, wiec pozwala nam ona określić
+Dla powyższej definicji $d$ jeśli $G_1 = G_2$ to $d(G_1, G_2) = 0$, wiec pozwala nam ona określić
 stopień podobieństwa dwóch osobników.\\
-Aktualny przebieg AG kończymy więc gdy co najmniej $m_c$ par spełnia $d(S_1, S_2) \leq d_t$,
-gdzie zarówno $d_t$ i $m_c$ są parametrami AG.
+Aktualny przebieg AG kończymy więc gdy co najmniej $\gamma_c$ par spełnia 
+$d(S_1, S_2) \leq \varepsilon$.\\
+Gdzie: $\varepsilon$ to pewna zadana dokładność, a $\gamma_c$ jest parametrem AG.
 
 
 \section{Implementacja}
+\label{sec:imp}
 Do zrealizowania opisanego wyżej AG użyłem języka \texttt{python} wraz z biblioteką 
 implementującą wiele operacji numerycznych \texttt{numpy}, natomiast do budowania i trenowania
 sieci neuronowych wykorzystałem popularną bibliotekę \texttt{tensorflow}. Aby przyśpieszyć
@@ -904,7 +935,21 @@ umożliwia proste budowanie modeli przy pomocy modułu \texttt{keras}. Poszczeg�
 rodzaje warstw mają swoje gotowe implementacje oraz reguły zaimplementowane w wyżej opisanym
 programie dają nam gwarancję że modele te będą poprawne. Algorytm genetyczny posiada wszystkie
 potrzebne parametry do przeprowadzenia procesu trenowania i zwrócenia potrzebnych dla niego
-wartości tzn oceny wydajności sieci oraz liczby trenowalnych parametrów.
+wartości tzn. oceny wydajności sieci oraz liczby trenowalnych parametrów. Musimy pamiętać
+aby dla zadań regresji i klasyfikacji użyte zostały odpowiednie metryki jakości SSN.
+W mojej implementacji wykorzystałem poniższe metryki:\\
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|}
+	\hline 
+	Rodzaj problemu & Metryka \\
+	\hline
+	Klasyfikacja & Precyzja \\
+	Regresja & Błąd Średniokwadratowy\\
+	\hline
+\end{tabular}
+\caption{\label{tam:met}Użyte metryki.}
+\end{table}
 
 \subsection{Reprezentacja genotypu}
 W \texttt{nn\_genome.py} znajduję się klasa opakowująca genotypom przy pomocy listy list.
@@ -1087,7 +1132,7 @@ AG dla tego zbioru danych preferuję wybór tego typu sieci.
 
 Z powyższego wykresu widzimy że sieci trenowane z parametrem $\alpha$ o wartości około 0.5
 radzą sobie równie dobrze jak siei z $\alpha$ bliskim 0.2, lecz jak wiemy z tabeli 
-[\hyperref[tab:fmres]{Tab. 10}] sieci te mają o wiele większe rozmiary. Dla sieci otrzymanych
+[\hyperref[tab:fmres]{Tab. 11}] sieci te mają o wiele mniejsze rozmiary. Dla sieci otrzymanych
 z przebiegu AG z wartością $\alpha$ bliżej 1.0 widzimy że możemy otrzymać znacznie mniejszą
 precyzję, ponieważ nie ma ona mniejszy wpływ na ocenę osobników.
 
@@ -1104,6 +1149,18 @@ domu w zależności od parametrów taki jak: wskaźnik przestępczości w mieśc
 \includegraphics[scale=0.4]{boston.png}
 \caption{Dane Boston Housing przedstawione w postaci tabeli.}
 \end{figure}
+
+Aby wszystkie wielkości danych wejściowych były podobnego rzędu  zostały one poddane 
+re-skalowaniu.
+W tym celu wykorzystałem klasę \texttt{StandardScaler} z biblioteki \texttt{scikit-learn}.
+Modyfikuję ona dane wejściowe według wzoru:
+\begin{equation}
+	z = \frac{x - \mu}{\sigma}
+\end{equation}
+gdzie:\\
+$x$ - pojedyncza próbka pobrana z danych wejściowych,\\
+$\mu$ - średnia danych wejściowych,\\
+$\sigma$ - odchylenie standardowe.\\
 
 Tak samo jak dla zbioru Fashion Mnist jedynym zmiennym parametrem AG 
 [\hyperref[tab:params]{Tab. 2}] jest $\alpha$.
@@ -1127,45 +1184,45 @@ Tak samo jak dla zbioru Fashion Mnist jedynym zmiennym parametrem AG
 \end{tabular}
 \caption{\label{tab:bh_params}Parametry AG dla Boston Housing.}
 \end{table}
-W porównaniu również do poprzedniego zbioru danych zostały zwiększone wartości
-maksymalne dla hiperparametrów SSN [\hyperref[tab:zakres]{Tab. 3}].
-
-\begin{table}[H]
-\centering
-\begin{tabular}{|c|c|}
-	\hline
-	Nazwa & Zakres Wartości  \\
-	\hline
-	Liczba neuronów           & $8*x$ dla $x\in \{1, ...,128\}$\\
-	Liczba Filtrów            & $8*x$ dla $x\in \{1, ...,64\}$\\
-	Rozmiar Pola Recepcyjnego & $3^x$ dla $x \in \{1, ...,6\}$\\
-	Krok Pola Recepcyjnego    & $x \in \{1, ...,6\}$\\
-	Rozmiar Pola Łączącego    & $2^x$ dla $x \in \{1, ...,6\}$\\
-	Współczynnik Porzucenia   & $x \in [0, 0.5]$\\
-	\hline
-\end{tabular}
-\caption{\label{tab:bh_zakres}Ograniczenia dla hiperparametrów SSN w przypadku Boston
-Housing.}
-\end{table}
-Wyniki otrzymane z powyższymi ograniczeniami:\\
+Natomiast wartości maksymalne hiperparametrów SSN [\hyperref[tab:zakres]{Tab. 3}] są takie
+same jak użyte dla zbioru użytego w poprzednim podrozdziale 
+[\hyperref[tab:fm_zakres]{Tab. 10}].\\
+Poniżej otrzymane wyniki otrzymane dla powyższych parametrów:
 \begin{table}[H]
 \centering
 \begin{tabular}{|c|c|c|c|}
         \hline
 	$\alpha$ & Rozmiar Sieci & Funkcja Oceny & MSE dla zbioru testowego\\
 	\hline
-	0.2 & 1282801 & 2.99 &  20.59 \\
-	0.3 & 1281249 & 3.59 & 21.38 \\
-	0.4 & 1626017 & 3.84 & 18.52\\
-	0.5 & 1718953 & 4.37 &  \\
-	0.6 & 21450 & 3.55 & 0.899 \\
-	0.7 & 7754 & 3.70 & 0.897 \\
-	0.8 & 5818 &  3.63 & 0.892 \\
-	0.9 & 986 & 3.20 & 0.81 \\
+	0.2 & 72537 & 7.10 &  28.05 \\
+	0.3 & 82121 & 6.58 & 30.16\\
+	0.4 & 210753 & 6.01 & 57.62\\
+	0.5 & 174217 & 5.84 &  24.55\\
+	0.6 & 361 & 5.89 & 78.55 \\
+	0.7 & 657 & 3.7 & 88.6 \\
+	0.8 & 369 &  4.4 & 170.53\\
+	0.9 & 121 & 3.04 & 364.81\\
 	\hline
 \end{tabular}
 \caption{\label{tab:fmres}Wyniki AG dla zbioru Fashion Mnist.}
 \end{table}
+ Z powyższej tabeli wybrałem dwie najbardziej różne sieci pod względem wartości MSE i 
+ przedstawiłem je do postaci genotypu.\\
+\begin{align*}
+	G_{\alpha_{0.5}} = \big[[1, 144, 2, 0, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0, 0, 0.25],\\
+	                        [1, 208, 2, 0, 0, 0, 0, 0], [1, 248, 2, 0, 0, 0, 0, 0],\\
+				[1, 200, 2, 0, 0, 0, 0, 0], [1, 152, 2, 0, 0, 0, 0, 0],\\
+				[1, 64, 2, 0, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0, 0, 0.34],\\
+				[1, 1, 4, 0, 0, 0, 0, 0]\big]
+\end{align*}
+\begin{align*}
+	G_{\alpha_{0.9}} = \big[[1, 8, 0, 0, 0, 0, 0, 0], [5, 0, 0, 0, 0, 0, 0, 0.4],\\
+	                       [1, 1, 4, 0, 0, 0, 0, 0]\big]
+\end{align*}
+Widzimy że w tym przypadku również na rozmiar sieci oraz wartości
+poszczególnych hiperparametrów w warstwach duży wpływ ma wartość $\alpha$.
+Ponieważ nie rozwiązujemy zadania związanego z przetwarzaniem obrazów jedyną sieciom 
+jaką może wygenerować AG w tym przypadku jest perceptron wielowarstwowy.
 
 \begin{figure}[H]
 \centering
@@ -1174,9 +1231,12 @@ Wyniki otrzymane z powyższymi ograniczeniami:\\
 (kolor złoty uśredniona wartość dla zadanej wartości $\alpha$).}
 \end{figure}
 
-
-
-
+AG tak jak i w przypadku zbioru użytego w podrozdziale wcześniej spisał się dobrze,
+sieci otrzymane dla niektórych wartości $\alpha$ otrzymują zadowalające wyniki na zbiorach
+testowych. Odpowiednio zwiększając liczbę eksperymentów $\gamma_r$, czy liczbę 
+osobników występujących w populacji $n$ itd. otrzymalibyśmy bardziej
+stabilne wyniki. Lecz nawet dla stosunkowo małych parametrów naszego mikro-AG otrzymane
+sieci będą znacznie lepsze niż sieci wykonane przez użytkownika budującego od zera bez odpowiedniej wiedzy modele sieci neuronowych, przy znacznie łatwiejszym w obsłudze interfejsie.\\
 \section{Bibliografia}
 \printbibliography
 

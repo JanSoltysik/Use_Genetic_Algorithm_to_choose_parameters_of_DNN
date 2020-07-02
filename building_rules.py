@@ -1,4 +1,7 @@
 import enum
+from typing import List
+
+NN_GENOME = List[List[int, int, int, int, int, int, int, float]]
 
 
 class LayerType(enum.Enum):

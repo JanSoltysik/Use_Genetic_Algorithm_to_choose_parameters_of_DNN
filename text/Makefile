@@ -19,4 +19,4 @@ all: $(target) Makefile
 	$(TEX) $^
 
 clean:
-	$(RM) *.toc *.dvi *.log *.aux *.bbl *.bcf *.blg *.xml *blx*
+	$(RM) *.toc *.dvi *.log *.aux *.bbl *.bcf *.blg *.xml *blx* *.out

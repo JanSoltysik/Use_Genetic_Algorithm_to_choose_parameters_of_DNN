@@ -11,7 +11,7 @@ from building_rules import LayerType, ActivationFunction, NN_STACKING_RULES, \
     NNArrayStructure, ELEMENTS_FROM_ARRAY_USED_BY_LAYER
 
 
-def replace_last_three_digits_with_zeros(number):
+def replace_last_three_digits_with_zeros(number : float) -> float:
     round_to = 10 ** 3
     if number <= round_to:
         return number

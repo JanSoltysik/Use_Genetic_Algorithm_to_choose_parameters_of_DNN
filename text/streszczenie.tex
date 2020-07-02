@@ -1,0 +1,63 @@
+\documentclass{article}
+
+\usepackage{polski}
+\usepackage[utf8]{inputenc}
+\usepackage[ruled,vlined]{algorithm2e}
+\usepackage{indentfirst}
+\usepackage{amssymb}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage[margin=1.3in]{geometry}
+\usepackage{physics}
+
+\usepackage{graphicx}
+\usepackage{float}
+\graphicspath{ {./images/} }
+
+\usepackage[backend=biber]{biblatex}
+\addbibresource{bibliography.bib}
+
+\usepackage{amsmath}
+\renewcommand{\vec}[1]{\mathbf{#1}}
+
+\title{Streszczenie}
+\author{Jan Sołtysik}
+
+
+\begin{document}
+\maketitle
+Celem pracy mojej pracy licencjackiej pt. "Zastosowanie algorytmu genetycznego do optymalizacji
+struktury sieci neuronowej" jest zaimplementowanie \textbf{algorytmu genetycznego (AG)}
+umożliwiającego znalezienie optymalnej struktury  \textbf{sztucznej sieci neuronowej (SSN)}.
+Sztuczne sieci neuronowe i uczenie głębokie są ostatnimi laty tematem numer jeden w świecie
+informatyki. Pomimo tego że nie jest to nowa dyscyplina, jej początki sięgają roku 1943.
+Jednak dopiero rozwój technologii oraz łatwy dostęp do ogromnych zbiorów danych pozwoliły
+pokazać SSN prawdziwy potencjał. Budowanie modeli SSN jest jednak procesem skomplikowanym,
+wymaga znajomości analizy matematycznej, statystyki, algebry itd. które potrzebne są do 
+zrozumienia algorytmów uczenia maszynowego. Współczesne biblioteki implementujące SSN znacznie
+upraszczają ich używanie, lecz wciąż to użytkownik musi wybrać multum hiperparametrów sieci
+takich jak: ilość i rodzaje warstw, funkcje aktywacyjne itd. Aby zautomatyzować proces
+wyboru hiperparametrów zmodyfikuję AG aby przystosować go do pracy z SSN.
+
+Do zrealizowania powyższego celu wykorzystałem język programowania 
+\texttt{python} wraz z popularnymi bibliotekami: 
+\begin{itemize}
+\item \texttt{numpy} - implementacja operacji numerycznych
+\item \texttt{tensorflow} - umożliwia budowanie SSN warstwami odpowiednio specyfikując
+hiperparametry sieci. Proces uczenia SSN został też uproszczony w wersji \texttt{2.0} biblioteki
+ponieważ sprowadza się do wywołania pojedynczej metody \texttt{fit}.
+\end{itemize}
+
+Struktura pracy jest następująca. We wstępie opisuję cel pracy, jej inspirację oraz krótko
+opisuję co jest zawarte w każdym z rozdziałów. W następnym rozdziale zawarte są potrzebne
+definicję i wzory potrzebne do zrozumienia elementarnego AG oraz sposobu działania SSN.
+Rozdział trzeci zawiera modyfikację AG która umożliwia znalezienie optymalnej struktury
+SSN. W rozdziale czwartym zawarte są szczegóły dotyczące implementacji opisanego algorytmu.
+Ostatni rozdział zawiera optymalne sieci znalezione przez stworzony w ramach pracy 
+algorytm. Algorytm został przetestowany na dwóch zbiorach danych zarówno
+dla problemu klasyfikacji jak i regresji: \textbf{Fashion-Mnist} - zadanie rozpoznania
+kategorii ubrania podając jego zdjęcie, oraz \textbf{Boston Housing} - przewidywanie
+ceny domu w zależności od wartości zadanych dla jego parametrów.
+
+
+
+\end{document}

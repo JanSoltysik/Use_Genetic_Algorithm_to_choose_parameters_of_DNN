@@ -10,7 +10,8 @@ activation_functions = {
     4: keras.activations.linear,
 }
 
-def get_output_layer_activation_function(nn_list):
+
+def get_output_layer_activation_function(nn_list) -> str:
     output_layer_activation_function = nn_list[-1][2]
     if output_layer_activation_function == 0:
         loss_fn = "binary_crossentropy"
@@ -21,7 +22,8 @@ def get_output_layer_activation_function(nn_list):
 
     return loss_fn
 
-def build_layer(layer):
+
+def build_layer(layer) -> keras.Layer:
     if layer[0] == 1:
         keras_layer = keras.layers.Dense(units=layer[1], activation=activation_functions[layer[2]],
                                          kernel_initializer="glorot_normal")
